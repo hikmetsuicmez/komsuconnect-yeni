@@ -3,6 +3,7 @@ package com.hikmetsuicmez.komsuconnect_backend.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,15 @@ public class JwtUtil {
     @Value("${jwt.access-token-expiration}")
     private long accessTokenExpiration;
 
+    @PostConstruct
+    public void validateSecretKey() {
+        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        if (keyBytes.length < 32) {
+            throw new IllegalStateException(
+                "jwt.secret must be at least 32 bytes for HMAC-SHA256. Current: " + keyBytes.length + " bytes.");
+        }
+    }
+
     public String generateToken(String email) {
         return Jwts.builder()
                 .subject(email)
@@ -38,10 +48,14 @@ public class JwtUtil {
         try {
             extractClaims(token);
             return true;
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            log.debug("JWT token expired");
+        } catch (io.jsonwebtoken.security.SignatureException | io.jsonwebtoken.MalformedJwtException e) {
+            log.warn("Invalid JWT signature or format");
         } catch (Exception e) {
-            log.warn("Invalid JWT token: {}", e.getMessage());
-            return false;
+            log.error("Unexpected JWT parsing error", e);
         }
+        return false;
     }
 
     private Claims extractClaims(String token) {
