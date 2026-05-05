@@ -14,8 +14,7 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class BusinessProfile {
 
@@ -33,10 +32,13 @@ public class BusinessProfile {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(length = 255)
     private String address;
 
+    @Column(length = 100)
     private String city;
 
+    @Column(length = 20)
     private String phone;
 
     @CreatedDate
