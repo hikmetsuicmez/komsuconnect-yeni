@@ -60,6 +60,11 @@ komsuconnect/
 - [ ] Backend: Keşif endpoint'leri, konum bazlı filtreleme
 - [ ] Frontend: Ana sayfa, esnaf listesi, esnaf profil sayfası, ürün görüntüleme
 
+#### Teknik Borçlar
+- [ ] **Auth güvenliği:** Token şu an Zustand persist ile localStorage'da tutuluyor.
+  - Backend: `POST /api/v1/auth/me` endpoint'i eklenir — sayfa yenilemede token sunucu tarafında doğrulanır.
+  - Frontend: localStorage yerine httpOnly cookie'ye geçilir.
+
 ### Sprint 4 — Cila & Deploy
 - [ ] Testler (JUnit + Playwright)
 - [ ] Supabase production setup
