@@ -30,9 +30,8 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public List<ProductResponse> getProducts(UUID businessId) {
-        if (!businessProfileRepository.existsById(businessId)) {
-            throw new BusinessProfileNotFoundException("Business profile not found");
-        }
+        businessProfileRepository.findById(businessId)
+                .orElseThrow(() -> new BusinessProfileNotFoundException("Business profile not found"));
         return productMapper.toResponseList(productRepository.findByBusinessProfileId(businessId));
     }
 
@@ -67,6 +66,7 @@ public class ProductService {
         product.setImageUrl(request.getImageUrl());
         product.setAvailable(request.getAvailable());
 
+        log.info("Product {} updated in business {}", productId, businessId);
         return productMapper.toResponse(product);
     }
 
@@ -97,7 +97,7 @@ public class ProductService {
 
     private void verifyProductBelongsToBusiness(Product product, UUID businessId) {
         if (!product.getBusinessProfile().getId().equals(businessId)) {
-            throw new ForbiddenException("Product does not belong to this business");
+            throw new ProductNotFoundException("Product not found");
         }
     }
 }
