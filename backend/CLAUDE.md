@@ -2,12 +2,13 @@
 
 ## Stack
 - **Java 21**
-- **Spring Boot 3.x**
+- **Spring Boot 3.5.x**
 - **PostgreSQL** (Supabase üzerinde)
-- **Spring Security + JWT**
+- **Spring Security + JWT** (JJWT 0.12.6)
 - **Spring Data JPA / Hibernate**
 - **Lombok**
-- **MapStruct** (DTO dönüşümleri için)
+- **MapStruct 1.5.5.Final** (DTO dönüşümleri için)
+- **Flyway** (schema migration)
 - **Maven**
 
 ## Mimari: Katmanlı Yapı
@@ -53,11 +54,13 @@ config/         ← Bean tanımları, CORS, vb.
 
 ## Güvenlik Kuralları
 
-- JWT token süresi: 24 saat (access), 7 gün (refresh)
+- JWT token süresi: 24 saat (access token — `jwt.access-token-expiration=86400000`)
+- Refresh token Sprint 1'de implement edilmedi; Sprint 2+ için planlandı
+- `UserDetailsService` → `security/UserDetailsServiceImpl.java` ayrı sınıf olarak tutulur (SecurityConfig içine inline yazılmaz)
 - Şifre: `BCryptPasswordEncoder` ile hash'lenir, düz metin asla saklanmaz
 - Public endpoint'ler açıkça tanımlanır, geri kalan her şey authenticated
 - Public endpoint'ler: `/api/v1/auth/**`, `/api/v1/businesses` (GET), `/api/v1/businesses/{id}` (GET)
-- CORS: Frontend URL'i için açık, diğerleri kapalı
+- CORS: `app.cors.allowed-origins` env variable'ından okunur, `SecurityConfig` içindeki `corsConfigurationSource()` bean'i ile yapılandırılır
 
 ## DTO Kuralları
 
