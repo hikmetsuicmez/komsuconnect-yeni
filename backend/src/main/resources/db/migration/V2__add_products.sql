@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS products (
     created_at          TIMESTAMP      NOT NULL,
     updated_at          TIMESTAMP      NOT NULL,
     CONSTRAINT fk_product_business FOREIGN KEY (business_profile_id)
-        REFERENCES business_profiles (id)
+        REFERENCES business_profiles (id) ON DELETE CASCADE
 );
