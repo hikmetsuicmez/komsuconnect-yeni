@@ -6,8 +6,10 @@ interface AuthState {
   token: string | null
   user: User | null
   isAuthenticated: boolean
+  _hasHydrated: boolean
   login: (token: string, user: User) => void
   logout: () => void
+  setHasHydrated: (value: boolean) => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -16,9 +18,16 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       user: null,
       isAuthenticated: false,
+      _hasHydrated: false,
       login: (token, user) => set({ token, user, isAuthenticated: true }),
       logout: () => set({ token: null, user: null, isAuthenticated: false }),
+      setHasHydrated: (value) => set({ _hasHydrated: value }),
     }),
-    { name: 'komsuconnect-auth' }
+    {
+      name: 'komsuconnect-auth',
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true)
+      },
+    }
   )
 )

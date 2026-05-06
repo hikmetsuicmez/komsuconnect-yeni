@@ -46,9 +46,9 @@ export default function LoginPage() {
     setServerError(null)
     try {
       const response = await api.post<AuthResponse>('/api/v1/auth/login', data)
-      const { token, accountType } = response.data
-      login(token, { email: data.email, accountType })
-      if (accountType === 'BUSINESS') {
+      const { token, role } = response.data
+      login(token, { email: data.email, accountType: role })
+      if (role === 'BUSINESS') {
         router.push('/dashboard')
       } else {
         router.push('/')

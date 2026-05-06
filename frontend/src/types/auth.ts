@@ -13,7 +13,9 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   token: string
-  accountType: 'USER' | 'BUSINESS'
+  email: string
+  fullName: string
+  role: 'USER' | 'BUSINESS'
 }
 
 export interface User {
