@@ -54,7 +54,13 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     setServerError(null)
     try {
-      const response = await api.post<AuthResponse>('/api/v1/auth/register', data)
+      const payload = {
+        fullName: `${data.firstName} ${data.lastName}`.trim(),
+        email: data.email,
+        password: data.password,
+        role: data.accountType,
+      }
+      const response = await api.post<AuthResponse>('/api/v1/auth/register', payload)
       const { token, accountType: type } = response.data
       login(token, { email: data.email, accountType: type })
       if (type === 'BUSINESS') {
