@@ -3,14 +3,17 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { useAuthStore } from '@/store/authStore'
 import { BusinessProvider } from '@/context/BusinessContext'
 import Sidebar from '@/components/dashboard/Sidebar'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuth()
+  const hasHydrated = useAuthStore((state) => state._hasHydrated)
   const router = useRouter()
 
   useEffect(() => {
+    if (!hasHydrated) return
     if (!isAuthenticated) {
       router.replace('/login')
       return
@@ -18,8 +21,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (user?.accountType !== 'BUSINESS') {
       router.replace('/')
     }
-  }, [isAuthenticated, user, router])
+  }, [hasHydrated, isAuthenticated, user, router])
 
+  if (!hasHydrated) return null
   if (!isAuthenticated || user?.accountType !== 'BUSINESS') return null
 
   return (

@@ -61,9 +61,9 @@ export default function RegisterPage() {
         role: data.accountType,
       }
       const response = await api.post<AuthResponse>('/api/v1/auth/register', payload)
-      const { token, accountType: type } = response.data
-      login(token, { email: data.email, accountType: type })
-      if (type === 'BUSINESS') {
+      const { token, role } = response.data
+      login(token, { email: data.email, accountType: role })
+      if (role === 'BUSINESS') {
         router.push('/dashboard')
       } else {
         router.push('/')
