@@ -64,6 +64,8 @@ komsuconnect/
 - [ ] **Auth güvenliği:** Token şu an Zustand persist ile localStorage'da tutuluyor.
   - Backend: `POST /api/v1/auth/me` endpoint'i eklenir — sayfa yenilemede token sunucu tarafında doğrulanır.
   - Frontend: localStorage yerine httpOnly cookie'ye geçilir.
+- [ ] **Ürün görseli:** `imageUrl` alanı backend'de mevcut fakat Sprint 2'de frontend'e dahil edilmedi.
+  - Frontend: Ürün ekleme/düzenleme modalına görsel yükleme özelliği eklenecek.
 
 ### Sprint 4 — Cila & Deploy
 - [ ] Testler (JUnit + Playwright)
