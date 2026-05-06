@@ -18,6 +18,6 @@ public class UpdateBusinessProfileRequest {
     @Size(max = 100)
     private String city;
 
-    @Size(max = 20)
+    @Size(min = 7, max = 20)
     private String phone;
 }

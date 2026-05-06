@@ -21,5 +21,6 @@ public class UpdateProductRequest {
 
     private String imageUrl;
 
-    private boolean available;
+    @NotNull
+    private Boolean available;
 }
