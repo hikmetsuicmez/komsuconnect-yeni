@@ -38,13 +38,21 @@ komsuconnect/
 - Frontend: Playwright (E2E)
 - Her sprint sonunda kritik akışları test eder
 
+## Branch Stratejisi
+
+- Her sprint için ayrı branch açılır: `sprint/N-kisa-aciklama`
+- Sprint bitince `main`'e PR açılır ve merge edilir
+- Örnek: `sprint/1-auth`, `sprint/2-business-panel`
+
+**Mevcut aktif branch:** `sprint/2-business-panel`
+
 ## Sprint Planı
 
-### Sprint 1 — Temel & Auth
-- [ ] Backend: User + Business entity, register/login endpoint, JWT
-- [ ] Frontend: Auth sayfaları (kayıt/giriş), layout, navigation
+### Sprint 1 — Temel & Auth ✅
+- [x] Backend: User + Business entity, register/login endpoint, JWT
+- [x] Frontend: Auth sayfaları (kayıt/giriş), layout, navigation
 
-### Sprint 2 — Esnaf Paneli
+### Sprint 2 — Esnaf Paneli (aktif — sprint/2-business-panel)
 - [ ] Backend: Business profil CRUD, Product CRUD
 - [ ] Frontend: Esnaf dashboard, ürün ekleme/düzenleme
 
