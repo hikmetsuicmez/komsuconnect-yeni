@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.UNAUTHORIZED, "Invalid email or password");
     }
 
-    @ExceptionHandler({BusinessProfileNotFoundException.class, ProductNotFoundException.class})
+    @ExceptionHandler({BusinessProfileNotFoundException.class, ProductNotFoundException.class, UserNotFoundException.class})
     public ResponseEntity<Map<String, Object>> handleNotFound(RuntimeException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }

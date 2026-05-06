@@ -8,6 +8,7 @@ import com.hikmetsuicmez.komsuconnect_backend.entity.User;
 import com.hikmetsuicmez.komsuconnect_backend.exception.BusinessProfileAlreadyExistsException;
 import com.hikmetsuicmez.komsuconnect_backend.exception.BusinessProfileNotFoundException;
 import com.hikmetsuicmez.komsuconnect_backend.exception.ForbiddenException;
+import com.hikmetsuicmez.komsuconnect_backend.exception.UserNotFoundException;
 import com.hikmetsuicmez.komsuconnect_backend.mapper.BusinessProfileMapper;
 import com.hikmetsuicmez.komsuconnect_backend.repository.BusinessProfileRepository;
 import com.hikmetsuicmez.komsuconnect_backend.repository.UserRepository;
@@ -30,7 +31,7 @@ public class BusinessProfileService {
 
     @Transactional(readOnly = true)
     public List<BusinessProfileResponse> getAllBusinesses() {
-        return businessProfileMapper.toResponseList(businessProfileRepository.findAll());
+        return businessProfileMapper.toResponseList(businessProfileRepository.findAllWithUser());
     }
 
     @Transactional(readOnly = true)
@@ -84,12 +85,12 @@ public class BusinessProfileService {
 
     private BusinessProfile findProfileOrThrow(UUID id) {
         return businessProfileRepository.findById(id)
-                .orElseThrow(() -> new BusinessProfileNotFoundException("Business not found: " + id));
+                .orElseThrow(() -> new BusinessProfileNotFoundException("Business profile not found"));
     }
 
     private User findUserOrThrow(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     private void verifyOwner(BusinessProfile profile, String email) {
