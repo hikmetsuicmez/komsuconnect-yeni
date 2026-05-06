@@ -96,6 +96,7 @@ public class ProductService {
     }
 
     private void verifyProductBelongsToBusiness(Product product, UUID businessId) {
+        // Return 404 (not 403) to avoid leaking that the product exists under a different business
         if (!product.getBusinessProfile().getId().equals(businessId)) {
             throw new ProductNotFoundException("Product not found");
         }
