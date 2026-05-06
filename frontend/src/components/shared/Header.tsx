@@ -1,10 +1,16 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+
+const AUTH_ROUTES = ['/login', '/register']
 
 export default function Header() {
   const { isAuthenticated, logout } = useAuth()
+  const pathname = usePathname()
+
+  if (AUTH_ROUTES.includes(pathname)) return null
 
   return (
     <header className="sticky top-0 z-50 bg-primary border-b border-muted">

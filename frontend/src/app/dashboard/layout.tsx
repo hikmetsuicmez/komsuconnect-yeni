@@ -9,16 +9,20 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace('/login')
+      return
     }
-  }, [isAuthenticated, router])
+    if (user?.accountType !== 'BUSINESS') {
+      router.replace('/')
+    }
+  }, [isAuthenticated, user, router])
 
-  if (!isAuthenticated) return null
+  if (!isAuthenticated || user?.accountType !== 'BUSINESS') return null
 
   return <>{children}</>
 }

@@ -9,6 +9,8 @@ interface AuthState {
   logout: () => void
 }
 
+// Sprint 2: Sayfa yenileme sonrası oturum kalıcılığı için
+// ya persist middleware (user bilgisi, token hariç) ya da /api/v1/auth/me endpoint'i eklenecek.
 export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   user: null,
