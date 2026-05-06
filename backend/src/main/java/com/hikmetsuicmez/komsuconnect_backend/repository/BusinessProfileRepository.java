@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface BusinessProfileRepository extends JpaRepository<BusinessProfile, UUID> {
     Optional<BusinessProfile> findByUserId(UUID userId);
+    boolean existsByUserId(UUID userId);
 }
