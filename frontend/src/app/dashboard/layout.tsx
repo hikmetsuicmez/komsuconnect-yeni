@@ -3,12 +3,10 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { BusinessProvider } from '@/context/BusinessContext'
+import Sidebar from '@/components/dashboard/Sidebar'
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuth()
   const router = useRouter()
 
@@ -24,5 +22,12 @@ export default function DashboardLayout({
 
   if (!isAuthenticated || user?.accountType !== 'BUSINESS') return null
 
-  return <>{children}</>
+  return (
+    <BusinessProvider>
+      <div className="flex min-h-[calc(100vh-4rem)]">
+        <Sidebar />
+        <main className="flex-1 p-8 min-w-0">{children}</main>
+      </div>
+    </BusinessProvider>
+  )
 }

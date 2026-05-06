@@ -38,19 +38,34 @@ komsuconnect/
 - Frontend: Playwright (E2E)
 - Her sprint sonunda kritik akışları test eder
 
+## Branch Stratejisi
+
+- Her sprint için ayrı branch açılır: `sprint/N-kisa-aciklama`
+- Sprint bitince `main`'e PR açılır ve merge edilir
+- Örnek: `sprint/1-auth`, `sprint/2-business-panel`
+
+**Mevcut aktif branch:** `sprint/2-business-panel`
+
 ## Sprint Planı
 
-### Sprint 1 — Temel & Auth
-- [ ] Backend: User + Business entity, register/login endpoint, JWT
-- [ ] Frontend: Auth sayfaları (kayıt/giriş), layout, navigation
+### Sprint 1 — Temel & Auth ✅
+- [x] Backend: User + Business entity, register/login endpoint, JWT
+- [x] Frontend: Auth sayfaları (kayıt/giriş), layout, navigation
 
-### Sprint 2 — Esnaf Paneli
+### Sprint 2 — Esnaf Paneli (aktif — sprint/2-business-panel)
 - [ ] Backend: Business profil CRUD, Product CRUD
 - [ ] Frontend: Esnaf dashboard, ürün ekleme/düzenleme
 
 ### Sprint 3 — Kullanıcı Tarafı
 - [ ] Backend: Keşif endpoint'leri, konum bazlı filtreleme
 - [ ] Frontend: Ana sayfa, esnaf listesi, esnaf profil sayfası, ürün görüntüleme
+
+#### Teknik Borçlar
+- [ ] **Auth güvenliği:** Token şu an Zustand persist ile localStorage'da tutuluyor.
+  - Backend: `POST /api/v1/auth/me` endpoint'i eklenir — sayfa yenilemede token sunucu tarafında doğrulanır.
+  - Frontend: localStorage yerine httpOnly cookie'ye geçilir.
+- [ ] **Ürün görseli:** `imageUrl` alanı backend'de mevcut fakat Sprint 2'de frontend'e dahil edilmedi.
+  - Frontend: Ürün ekleme/düzenleme modalına görsel yükleme özelliği eklenecek.
 
 ### Sprint 4 — Cila & Deploy
 - [ ] Testler (JUnit + Playwright)
