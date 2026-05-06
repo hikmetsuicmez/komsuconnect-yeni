@@ -6,7 +6,7 @@
 
 **Architecture:** Nested routes (`/dashboard/profile`, `/dashboard/products`) share business profile state via `BusinessContext` provided in `dashboard/layout.tsx`. The layout handles auth guard + sidebar layout. Profile form is smart (POST when no profile exists, PUT when updating). Products tab is locked until profile is saved.
 
-**Tech Stack:** Next.js 16 App Router, React 19, TypeScript strict, Tailwind CSS, Zustand v5 + persist, React Hook Form, Zod v4, Axios, Lucide React
+**Tech Stack:** Next.js 16 App Router, React 19, TypeScript strict, Tailwind CSS, Zustand v5 + persist, React Hook Form, Zod v4, Axios, Lucide React, 21st.dev Magic MCP
 
 ---
 
@@ -18,12 +18,13 @@
 | MODIFY | `src/store/authStore.ts` | Add Zustand persist middleware |
 | CREATE | `src/context/BusinessContext.tsx` | Fetch + share profile state, refreshProfile action |
 | CREATE | `src/hooks/useBusiness.ts` | Convenience hook for BusinessContext |
-| CREATE | `src/components/dashboard/Sidebar.tsx` | Left nav, disables Ürünlerim when no profile |
+| CREATE | `src/components/ui/dialog.tsx` | 21st.dev'den alınan modal/dialog primitive'i (Task 9'da oluşturulur) |
+| CREATE | `src/components/dashboard/Sidebar.tsx` | Left nav, 21st.dev ilhamıyla, disables Ürünlerim when no profile |
 | MODIFY | `src/app/dashboard/layout.tsx` | Add BusinessProvider + sidebar layout |
 | MODIFY | `src/app/dashboard/page.tsx` | Redirect to /dashboard/profile |
 | CREATE | `src/components/dashboard/ProfileForm.tsx` | Profile create/update form (RHF + Zod) |
 | CREATE | `src/app/dashboard/profile/page.tsx` | Profile tab page |
-| CREATE | `src/components/dashboard/ProductModal.tsx` | Add/edit product modal (RHF + Zod) |
+| CREATE | `src/components/dashboard/ProductModal.tsx` | Add/edit product modal, dialog.tsx kullanır |
 | CREATE | `src/components/dashboard/ProductTable.tsx` | Product list with edit/delete actions |
 | CREATE | `src/app/dashboard/products/page.tsx` | Products tab page |
 
@@ -267,7 +268,20 @@ git commit -m "feat: add BusinessContext and useBusiness hook for shared profile
 **Files:**
 - Create: `src/components/dashboard/Sidebar.tsx`
 
-- [ ] **Step 1: Create Sidebar**
+**21st.dev:** Before writing the sidebar, search 21st.dev for a sidebar navigation component. If a suitable one is found, add it to `src/components/ui/` and adapt it. If nothing fits the dark-mode brand (primary `#1a1a2e`, accent `#e94560`), use the fallback implementation in Step 2.
+
+- [ ] **Step 1: Search 21st.dev for sidebar navigation inspiration**
+
+Use the `mcp__magic__21st_magic_component_inspiration` tool:
+```
+query: "dashboard sidebar navigation dark"
+```
+
+Evaluate the result:
+- If a component fits the brand (dark background, left-aligned nav items, active state highlight) → use `mcp__magic__21st_magic_component_builder` to adapt it to the brand colors and save to `src/components/ui/sidebar-nav.tsx`, then use it inside `Sidebar.tsx`.
+- If nothing fits → proceed to Step 2 with the fallback implementation.
+
+- [ ] **Step 2: Create Sidebar**
 
 ```typescript
 // src/components/dashboard/Sidebar.tsx
@@ -700,13 +714,44 @@ git commit -m "feat: add profile dashboard page with loading and error states"
 ## Task 9: ProductModal Component
 
 **Files:**
+- Create: `src/components/ui/dialog.tsx` (21st.dev'den — modal primitive)
 - Create: `src/components/dashboard/ProductModal.tsx`
 
 **Context:** `product` prop is `undefined` for new product (POST) or a `Product` for editing (PUT). `onSuccess` callback is called after successful save — the parent (ProductTable) uses it to refresh the list.
 
 **Note on price input:** Price is stored as `number` in `Product` but HTML `<input type="number">` gives a string. The form uses `z.string()` with manual `parseFloat` to avoid Zod v4's `z.coerce.number()` pitfalls with empty strings.
 
-- [ ] **Step 1: Create ProductModal**
+**21st.dev:** Search for a modal/dialog component first. The found primitive goes to `src/components/ui/dialog.tsx`. ProductModal then uses it as the outer shell instead of the raw `<div className="fixed inset-0 ...">` fallback.
+
+- [ ] **Step 1: Search 21st.dev for a modal/dialog component**
+
+Use the `mcp__magic__21st_magic_component_inspiration` tool:
+```
+query: "modal dialog dark overlay"
+```
+
+Then use `mcp__magic__21st_magic_component_builder` to build and adapt to project brand colors:
+- Background: `bg-surface` (`#16213e`)
+- Border: `border-muted` (`#0f3460`)
+- Overlay: `bg-black/60`
+- Close button: `text-foreground/40 hover:text-foreground`
+
+Save the result as `src/components/ui/dialog.tsx`. It should export at minimum:
+```typescript
+// Expected exports from dialog.tsx
+export function Dialog({ open, onClose, children }: {
+  open: boolean
+  onClose: () => void
+  children: React.ReactNode
+})
+export function DialogHeader({ children }: { children: React.ReactNode })
+export function DialogTitle({ children }: { children: React.ReactNode })
+export function DialogContent({ children }: { children: React.ReactNode })
+```
+
+If 21st.dev does not return a usable result, skip `dialog.tsx` and use the raw overlay `<div>` implementation in ProductModal directly (the fallback in Step 2 is self-contained and does not import from dialog.tsx).
+
+- [ ] **Step 2: Create ProductModal**
 
 ```typescript
 // src/components/dashboard/ProductModal.tsx
