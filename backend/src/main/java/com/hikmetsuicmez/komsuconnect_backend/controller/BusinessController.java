@@ -2,6 +2,7 @@ package com.hikmetsuicmez.komsuconnect_backend.controller;
 
 import com.hikmetsuicmez.komsuconnect_backend.dto.request.CreateBusinessProfileRequest;
 import com.hikmetsuicmez.komsuconnect_backend.dto.request.UpdateBusinessProfileRequest;
+import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileDetailResponse;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileResponse;
 import com.hikmetsuicmez.komsuconnect_backend.service.BusinessProfileService;
 import jakarta.validation.Valid;
@@ -23,8 +24,14 @@ public class BusinessController {
     private final BusinessProfileService businessProfileService;
 
     @GetMapping
-    public ResponseEntity<List<BusinessProfileResponse>> getAllBusinesses() {
-        return ResponseEntity.ok(businessProfileService.getAllBusinesses());
+    public ResponseEntity<List<BusinessProfileResponse>> getAllBusinesses(
+            @RequestParam(required = false) String city) {
+        return ResponseEntity.ok(businessProfileService.getAllBusinesses(city));
+    }
+
+    @GetMapping("/cities")
+    public ResponseEntity<List<String>> getCities() {
+        return ResponseEntity.ok(businessProfileService.getCities());
     }
 
     @GetMapping("/me")
@@ -34,7 +41,7 @@ public class BusinessController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BusinessProfileResponse> getBusinessById(@PathVariable UUID id) {
+    public ResponseEntity<BusinessProfileDetailResponse> getBusinessById(@PathVariable UUID id) {
         return ResponseEntity.ok(businessProfileService.getBusinessById(id));
     }
 

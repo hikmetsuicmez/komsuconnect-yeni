@@ -2,7 +2,9 @@ package com.hikmetsuicmez.komsuconnect_backend.service;
 
 import com.hikmetsuicmez.komsuconnect_backend.dto.request.CreateBusinessProfileRequest;
 import com.hikmetsuicmez.komsuconnect_backend.dto.request.UpdateBusinessProfileRequest;
+import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileDetailResponse;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileResponse;
+import com.hikmetsuicmez.komsuconnect_backend.dto.response.ProductResponse;
 import com.hikmetsuicmez.komsuconnect_backend.entity.BusinessProfile;
 import com.hikmetsuicmez.komsuconnect_backend.entity.User;
 import com.hikmetsuicmez.komsuconnect_backend.exception.BusinessProfileAlreadyExistsException;
@@ -10,7 +12,9 @@ import com.hikmetsuicmez.komsuconnect_backend.exception.BusinessProfileNotFoundE
 import com.hikmetsuicmez.komsuconnect_backend.exception.ForbiddenException;
 import com.hikmetsuicmez.komsuconnect_backend.exception.UserNotFoundException;
 import com.hikmetsuicmez.komsuconnect_backend.mapper.BusinessProfileMapper;
+import com.hikmetsuicmez.komsuconnect_backend.mapper.ProductMapper;
 import com.hikmetsuicmez.komsuconnect_backend.repository.BusinessProfileRepository;
+import com.hikmetsuicmez.komsuconnect_backend.repository.ProductRepository;
 import com.hikmetsuicmez.komsuconnect_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,15 +34,50 @@ public class BusinessProfileService {
     private final BusinessProfileRepository businessProfileRepository;
     private final UserRepository userRepository;
     private final BusinessProfileMapper businessProfileMapper;
+    private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     @Transactional(readOnly = true)
-    public List<BusinessProfileResponse> getAllBusinesses() {
-        return businessProfileMapper.toResponseList(businessProfileRepository.findAllWithUser());
+    public List<BusinessProfileResponse> getAllBusinesses(String city) {
+        List<BusinessProfile> profiles = (city != null && !city.isBlank())
+                ? businessProfileRepository.findAllByCity(city)
+                : businessProfileRepository.findAllWithUser();
+
+        Map<UUID, Long> countMap = buildProductCountMap();
+
+        return profiles.stream()
+                .map(bp -> {
+                    BusinessProfileResponse response = businessProfileMapper.toResponse(bp);
+                    response.setProductCount(countMap.getOrDefault(bp.getId(), 0L));
+                    return response;
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public BusinessProfileResponse getBusinessById(UUID id) {
-        return businessProfileMapper.toResponse(findProfileOrThrow(id));
+    public BusinessProfileDetailResponse getBusinessById(UUID id) {
+        BusinessProfile profile = findProfileOrThrow(id);
+        List<ProductResponse> products = productMapper.toResponseList(
+                productRepository.findByBusinessProfileId(id));
+
+        return BusinessProfileDetailResponse.builder()
+                .id(profile.getId())
+                .userId(profile.getUser().getId())
+                .businessName(profile.getBusinessName())
+                .description(profile.getDescription())
+                .address(profile.getAddress())
+                .city(profile.getCity())
+                .phone(profile.getPhone())
+                .createdAt(profile.getCreatedAt())
+                .updatedAt(profile.getUpdatedAt())
+                .productCount(products.size())
+                .products(products)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getCities() {
+        return businessProfileRepository.findDistinctCities();
     }
 
     @Transactional
@@ -81,6 +122,14 @@ public class BusinessProfileService {
         BusinessProfile profile = businessProfileRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new BusinessProfileNotFoundException("No business profile found for this account"));
         return businessProfileMapper.toResponse(profile);
+    }
+
+    private Map<UUID, Long> buildProductCountMap() {
+        return productRepository.findProductCountsByBusinessProfile().stream()
+                .collect(Collectors.toMap(
+                        row -> (UUID) row[0],
+                        row -> (Long) row[1]
+                ));
     }
 
     private BusinessProfile findProfileOrThrow(UUID id) {
