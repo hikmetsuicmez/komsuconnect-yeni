@@ -14,4 +14,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     @Query("SELECT p.businessProfile.id, COUNT(p) FROM Product p GROUP BY p.businessProfile.id")
     List<Object[]> findProductCountsByBusinessProfile();
+
+    long countByBusinessProfileId(UUID businessProfileId);
 }

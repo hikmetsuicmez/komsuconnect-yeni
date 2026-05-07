@@ -122,7 +122,9 @@ public class BusinessProfileService {
         User user = findUserOrThrow(email);
         BusinessProfile profile = businessProfileRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new BusinessProfileNotFoundException("No business profile found for this account"));
-        return businessProfileMapper.toResponse(profile);
+        BusinessProfileResponse response = businessProfileMapper.toResponse(profile);
+        response.setProductCount(productRepository.countByBusinessProfileId(profile.getId()));
+        return response;
     }
 
     private Map<UUID, Long> buildProductCountMap() {
