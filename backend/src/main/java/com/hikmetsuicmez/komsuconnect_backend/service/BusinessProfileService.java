@@ -56,7 +56,8 @@ public class BusinessProfileService {
 
     @Transactional(readOnly = true)
     public BusinessProfileDetailResponse getBusinessById(UUID id) {
-        BusinessProfile profile = findProfileOrThrow(id);
+        BusinessProfile profile = businessProfileRepository.findByIdWithUser(id)
+                .orElseThrow(() -> new BusinessProfileNotFoundException("Business profile not found"));
         List<ProductResponse> products = productMapper.toResponseList(
                 productRepository.findByBusinessProfileId(id));
 
@@ -127,8 +128,8 @@ public class BusinessProfileService {
     private Map<UUID, Long> buildProductCountMap() {
         return productRepository.findProductCountsByBusinessProfile().stream()
                 .collect(Collectors.toMap(
-                        row -> (UUID) row[0],
-                        row -> (Long) row[1]
+                        row -> UUID.fromString(row[0].toString()),
+                        row -> ((Number) row[1]).longValue()
                 ));
     }
 

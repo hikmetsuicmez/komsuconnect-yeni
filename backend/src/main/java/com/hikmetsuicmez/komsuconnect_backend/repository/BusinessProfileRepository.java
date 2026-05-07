@@ -23,4 +23,7 @@ public interface BusinessProfileRepository extends JpaRepository<BusinessProfile
     @Query("SELECT DISTINCT bp.city FROM BusinessProfile bp " +
            "WHERE bp.city IS NOT NULL AND bp.city <> '' ORDER BY bp.city")
     List<String> findDistinctCities();
+
+    @Query("SELECT bp FROM BusinessProfile bp JOIN FETCH bp.user WHERE bp.id = :id")
+    Optional<BusinessProfile> findByIdWithUser(@Param("id") UUID id);
 }
