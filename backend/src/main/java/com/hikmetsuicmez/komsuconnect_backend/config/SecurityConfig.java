@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/businesses/me").authenticated()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/businesses",
+                                "/api/v1/businesses/cities",
                                 "/api/v1/businesses/{id}",
                                 "/api/v1/businesses/{id}/products").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/businesses").hasRole("BUSINESS")

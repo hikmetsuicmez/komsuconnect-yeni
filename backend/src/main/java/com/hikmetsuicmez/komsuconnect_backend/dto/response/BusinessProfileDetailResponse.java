@@ -6,13 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BusinessProfileResponse {
+public class BusinessProfileDetailResponse {
     private UUID id;
     private UUID userId;
     private String businessName;
@@ -23,4 +24,5 @@ public class BusinessProfileResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private long productCount;
+    private List<ProductResponse> products;
 }
