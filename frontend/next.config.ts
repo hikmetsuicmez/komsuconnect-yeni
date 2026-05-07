@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
+        // TODO Sprint 4: narrow to actual CDN hostname before production deploy
         protocol: 'https',
         hostname: '**',
       },
