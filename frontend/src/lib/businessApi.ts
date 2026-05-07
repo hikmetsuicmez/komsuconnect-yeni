@@ -5,6 +5,7 @@ import type {
 } from '@/types/business'
 
 const BASE = process.env.NEXT_PUBLIC_API_URL
+if (!BASE) throw new Error('NEXT_PUBLIC_API_URL is not set')
 
 export async function getBusinesses(
   city?: string
@@ -36,9 +37,15 @@ export async function getCities(): Promise<string[]> {
 export async function getBusinessById(
   id: string
 ): Promise<BusinessPublicDetail> {
-  const res = await fetch(`${BASE}/api/v1/businesses/${id}`, {
-    next: { revalidate: 30 },
-  })
-  if (!res.ok) notFound()
+  let res: Response
+  try {
+    res = await fetch(`${BASE}/api/v1/businesses/${id}`, {
+      next: { revalidate: 30 },
+    })
+  } catch (err) {
+    throw new Error(`Failed to fetch business ${id}`, { cause: err })
+  }
+  if (res.status === 404) notFound()
+  if (!res.ok) throw new Error(`Unexpected status ${res.status} for business ${id}`)
   return res.json()
 }
