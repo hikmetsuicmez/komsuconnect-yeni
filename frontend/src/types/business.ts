@@ -42,3 +42,31 @@ export interface CreateProductRequest {
 }
 
 export type UpdateProductRequest = CreateProductRequest
+
+export interface BusinessPublicSummary {
+  id: string
+  businessName: string
+  description: string | null
+  city: string | null
+  productCount: number
+}
+
+export interface ProductPublic {
+  id: string
+  name: string
+  description: string | null
+  price: number
+  imageUrl: string | null
+  available: boolean
+}
+
+export interface BusinessPublicDetail {
+  id: string
+  businessName: string
+  description: string | null
+  address: string | null
+  city: string | null
+  phone: string | null
+  productCount: number
+  products: ProductPublic[]
+}
