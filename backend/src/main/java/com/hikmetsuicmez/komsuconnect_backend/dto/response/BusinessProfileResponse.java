@@ -22,4 +22,5 @@ public class BusinessProfileResponse {
     private String phone;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private long productCount;
 }
