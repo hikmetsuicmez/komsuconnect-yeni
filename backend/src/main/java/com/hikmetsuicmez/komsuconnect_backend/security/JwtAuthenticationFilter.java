@@ -53,6 +53,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
             return header.substring(7);
         }
+        jakarta.servlet.http.Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (jakarta.servlet.http.Cookie cookie : cookies) {
+                if ("jwt-token".equals(cookie.getName())) {
+                    String value = cookie.getValue();
+                    return StringUtils.hasText(value) ? value : null;
+                }
+            }
+        }
         return null;
     }
 }
