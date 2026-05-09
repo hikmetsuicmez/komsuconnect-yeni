@@ -9,11 +9,11 @@ import Sidebar from '@/components/dashboard/Sidebar'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuth()
-  const hasHydrated = useAuthStore((state) => state._hasHydrated)
+  const sessionChecked = useAuthStore((state) => state._sessionChecked)
   const router = useRouter()
 
   useEffect(() => {
-    if (!hasHydrated) return
+    if (!sessionChecked) return
     if (!isAuthenticated) {
       router.replace('/login')
       return
@@ -21,9 +21,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (user?.accountType !== 'BUSINESS') {
       router.replace('/')
     }
-  }, [hasHydrated, isAuthenticated, user, router])
+  }, [sessionChecked, isAuthenticated, user, router])
 
-  if (!hasHydrated) return null
+  if (!sessionChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+      </div>
+    )
+  }
+
   if (!isAuthenticated || user?.accountType !== 'BUSINESS') return null
 
   return (
