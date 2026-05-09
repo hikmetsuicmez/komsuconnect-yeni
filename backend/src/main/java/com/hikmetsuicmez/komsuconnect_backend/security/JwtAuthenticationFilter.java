@@ -2,6 +2,7 @@ package com.hikmetsuicmez.komsuconnect_backend.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,8 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    public static final String JWT_COOKIE_NAME = "jwt-token";
+
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
@@ -30,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = extractToken(request);
-        if (token != null) {
+        if (token != null && jwtUtil.isTokenValid(token)) {
             try {
                 String email = jwtUtil.extractEmail(token);
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -52,6 +55,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
         if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
             return header.substring(7);
+        }
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (JWT_COOKIE_NAME.equals(cookie.getName())) {
+                    String value = cookie.getValue();
+                    return StringUtils.hasText(value) ? value : null;
+                }
+            }
         }
         return null;
     }
