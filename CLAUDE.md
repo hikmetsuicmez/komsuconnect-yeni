@@ -44,7 +44,7 @@ komsuconnect/
 - Sprint bitince `main`'e PR açılır ve merge edilir
 - Örnek: `sprint/1-auth`, `sprint/2-business-panel`
 
-**Mevcut aktif branch:** `sprint/2-business-panel`
+**Mevcut aktif branch:** `sprint/4-polish-deploy`
 
 ## Sprint Planı
 
@@ -52,26 +52,26 @@ komsuconnect/
 - [x] Backend: User + Business entity, register/login endpoint, JWT
 - [x] Frontend: Auth sayfaları (kayıt/giriş), layout, navigation
 
-### Sprint 2 — Esnaf Paneli (aktif — sprint/2-business-panel)
-- [ ] Backend: Business profil CRUD, Product CRUD
-- [ ] Frontend: Esnaf dashboard, ürün ekleme/düzenleme
+### Sprint 2 — Esnaf Paneli ✅
+- [x] Backend: Business profil CRUD, Product CRUD
+- [x] Frontend: Esnaf dashboard, ürün ekleme/düzenleme
 
-### Sprint 3 — Kullanıcı Tarafı
-- [ ] Backend: Keşif endpoint'leri, konum bazlı filtreleme
-- [ ] Frontend: Ana sayfa, esnaf listesi, esnaf profil sayfası, ürün görüntüleme
+### Sprint 3 — Kullanıcı Tarafı ✅
+- [x] Backend: Keşif endpoint'leri, konum bazlı filtreleme
+- [x] Frontend: Ana sayfa, esnaf listesi, esnaf profil sayfası, ürün görüntüleme
 
-#### Teknik Borçlar
+### Sprint 4 — Cila & Deploy (aktif — sprint/4-polish-deploy)
+- [ ] Testler (JUnit + Playwright)
+- [ ] Supabase production setup
+- [ ] Frontend → Vercel deploy
+- [ ] Backend → Railway/Render deploy
+
+#### Teknik Borçlar (Sprint 3'ten devredildi)
 - [ ] **Auth güvenliği:** Token şu an Zustand persist ile localStorage'da tutuluyor.
   - Backend: `POST /api/v1/auth/me` endpoint'i eklenir — sayfa yenilemede token sunucu tarafında doğrulanır.
   - Frontend: localStorage yerine httpOnly cookie'ye geçilir.
 - [ ] **Ürün görseli:** `imageUrl` alanı backend'de mevcut fakat Sprint 2'de frontend'e dahil edilmedi.
   - Frontend: Ürün ekleme/düzenleme modalına görsel yükleme özelliği eklenecek.
-
-### Sprint 4 — Cila & Deploy
-- [ ] Testler (JUnit + Playwright)
-- [ ] Supabase production setup
-- [ ] Frontend → Vercel deploy
-- [ ] Backend → Railway/Render deploy
 
 ## Genel Kurallar
 
