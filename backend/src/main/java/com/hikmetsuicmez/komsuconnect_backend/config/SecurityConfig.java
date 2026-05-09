@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/me").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/health").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         // /me must be listed before /{id} so Spring Security matches exact path first

@@ -21,7 +21,7 @@ public class UpdateProductRequest {
     private BigDecimal price;
 
     @Pattern(
-        regexp = "^(https?://.*)?$",
+        regexp = "^(https?://.+)?$",
         message = "imageUrl geçerli bir HTTP veya HTTPS URL'i olmalı"
     )
     private String imageUrl;

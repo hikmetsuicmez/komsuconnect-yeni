@@ -57,4 +57,16 @@ class CreateProductRequestValidationTest {
 
         assertThat(violations).noneMatch(v -> v.getPropertyPath().toString().equals("imageUrl"));
     }
+
+    @Test
+    void imageUrl_withPrefixOnlyUrl_failsValidation() {
+        CreateProductRequest request = new CreateProductRequest();
+        request.setName("Test Ürün");
+        request.setPrice(BigDecimal.valueOf(10.0));
+        request.setImageUrl("https://");
+
+        Set<ConstraintViolation<CreateProductRequest>> violations = validator.validate(request);
+
+        assertThat(violations).anyMatch(v -> v.getPropertyPath().toString().equals("imageUrl"));
+    }
 }
