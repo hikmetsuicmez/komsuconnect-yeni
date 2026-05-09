@@ -3,9 +3,11 @@ package com.hikmetsuicmez.komsuconnect_backend.service;
 import com.hikmetsuicmez.komsuconnect_backend.dto.request.LoginRequest;
 import com.hikmetsuicmez.komsuconnect_backend.dto.request.RegisterRequest;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.AuthResponse;
+import com.hikmetsuicmez.komsuconnect_backend.dto.response.MeResponse;
 import com.hikmetsuicmez.komsuconnect_backend.entity.Role;
 import com.hikmetsuicmez.komsuconnect_backend.entity.User;
 import com.hikmetsuicmez.komsuconnect_backend.exception.EmailAlreadyExistsException;
+import com.hikmetsuicmez.komsuconnect_backend.exception.UserNotFoundException;
 import com.hikmetsuicmez.komsuconnect_backend.repository.UserRepository;
 import com.hikmetsuicmez.komsuconnect_backend.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -66,6 +68,16 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .token(token)
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .role(user.getRole().name())
+                .build();
+    }
+
+    public MeResponse me(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + email));
+        return MeResponse.builder()
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 .role(user.getRole().name())

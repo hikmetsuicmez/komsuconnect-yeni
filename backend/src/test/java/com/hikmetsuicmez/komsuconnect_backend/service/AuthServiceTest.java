@@ -3,9 +3,11 @@ package com.hikmetsuicmez.komsuconnect_backend.service;
 import com.hikmetsuicmez.komsuconnect_backend.dto.request.LoginRequest;
 import com.hikmetsuicmez.komsuconnect_backend.dto.request.RegisterRequest;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.AuthResponse;
+import com.hikmetsuicmez.komsuconnect_backend.dto.response.MeResponse;
 import com.hikmetsuicmez.komsuconnect_backend.entity.Role;
 import com.hikmetsuicmez.komsuconnect_backend.entity.User;
 import com.hikmetsuicmez.komsuconnect_backend.exception.EmailAlreadyExistsException;
+import com.hikmetsuicmez.komsuconnect_backend.exception.UserNotFoundException;
 import com.hikmetsuicmez.komsuconnect_backend.repository.UserRepository;
 import com.hikmetsuicmez.komsuconnect_backend.security.JwtUtil;
 import org.junit.jupiter.api.Test;
@@ -111,5 +113,29 @@ class AuthServiceTest {
                 .isInstanceOf(BadCredentialsException.class);
 
         verify(userRepository, never()).findByEmail(any());
+    }
+
+    @Test
+    void me_withValidEmail_returnsMeResponse() {
+        User user = User.builder()
+                .email("test@example.com")
+                .fullName("Test User")
+                .role(Role.USER)
+                .build();
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+
+        MeResponse response = authService.me("test@example.com");
+
+        assertThat(response.getEmail()).isEqualTo("test@example.com");
+        assertThat(response.getFullName()).isEqualTo("Test User");
+        assertThat(response.getRole()).isEqualTo("USER");
+    }
+
+    @Test
+    void me_withUnknownEmail_throwsUserNotFoundException() {
+        when(userRepository.findByEmail("ghost@example.com")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> authService.me("ghost@example.com"))
+                .isInstanceOf(UserNotFoundException.class);
     }
 }
