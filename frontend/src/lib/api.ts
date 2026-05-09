@@ -3,6 +3,7 @@ import { useAuthStore } from '@/store/authStore'
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
 })
 
 api.interceptors.request.use((config) => {
@@ -16,7 +17,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (
+      error.response?.status === 401 &&
+      !error.config?.url?.endsWith('/auth/me')
+    ) {
       useAuthStore.getState().logout()
       if (typeof window !== 'undefined') {
         window.location.href = '/login'
