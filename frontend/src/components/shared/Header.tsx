@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth'
 const AUTH_ROUTES = ['/login', '/register']
 
 export default function Header() {
-  const { isAuthenticated, logout } = useAuth()
+  const { isAuthenticated, logout, user } = useAuth()
   const pathname = usePathname()
 
   if (AUTH_ROUTES.includes(pathname)) return null
@@ -19,6 +19,20 @@ export default function Header() {
           KomsuConnect
         </Link>
         <nav className="flex items-center gap-4">
+          <Link
+            href="/"
+            className="text-sm text-foreground/70 hover:text-foreground transition-colors"
+          >
+            Esnafları Keşfet
+          </Link>
+          {isAuthenticated && user?.accountType === 'BUSINESS' && (
+            <Link
+              href="/dashboard"
+              className="text-sm text-foreground/70 hover:text-foreground transition-colors"
+            >
+              Panel
+            </Link>
+          )}
           {isAuthenticated ? (
             <button
               onClick={logout}
