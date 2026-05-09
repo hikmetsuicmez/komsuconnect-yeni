@@ -34,12 +34,13 @@ class JwtAuthenticationFilterTest {
     @Test
     void doFilter_withValidCookieAndNoHeader_setsAuthentication() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setCookies(new Cookie("jwt-token", "cookie-token"));
+        request.setCookies(new Cookie(JwtAuthenticationFilter.JWT_COOKIE_NAME, "cookie-token"));
         MockHttpServletResponse response = new MockHttpServletResponse();
         FilterChain chain = mock(FilterChain.class);
 
         UserDetails userDetails = mock(UserDetails.class);
         when(userDetails.getAuthorities()).thenReturn(List.of());
+        when(jwtUtil.isTokenValid("cookie-token")).thenReturn(true);
         when(jwtUtil.extractEmail("cookie-token")).thenReturn("user@example.com");
         when(userDetailsService.loadUserByUsername("user@example.com")).thenReturn(userDetails);
 
@@ -53,12 +54,13 @@ class JwtAuthenticationFilterTest {
     void doFilter_prefersAuthorizationHeaderOverCookie() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer header-token");
-        request.setCookies(new Cookie("jwt-token", "cookie-token"));
+        request.setCookies(new Cookie(JwtAuthenticationFilter.JWT_COOKIE_NAME, "cookie-token"));
         MockHttpServletResponse response = new MockHttpServletResponse();
         FilterChain chain = mock(FilterChain.class);
 
         UserDetails userDetails = mock(UserDetails.class);
         when(userDetails.getAuthorities()).thenReturn(List.of());
+        when(jwtUtil.isTokenValid("header-token")).thenReturn(true);
         when(jwtUtil.extractEmail("header-token")).thenReturn("user@example.com");
         when(userDetailsService.loadUserByUsername("user@example.com")).thenReturn(userDetails);
 
@@ -66,6 +68,7 @@ class JwtAuthenticationFilterTest {
 
         verify(jwtUtil).extractEmail("header-token");
         verify(jwtUtil, never()).extractEmail("cookie-token");
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNotNull();
     }
 
     @Test
@@ -79,5 +82,21 @@ class JwtAuthenticationFilterTest {
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
         verify(chain).doFilter(request, response);
         verifyNoInteractions(jwtUtil);
+    }
+
+    @Test
+    void doFilter_withInvalidCookieToken_doesNotSetAuthentication() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setCookies(new Cookie(JwtAuthenticationFilter.JWT_COOKIE_NAME, "invalid-token"));
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        FilterChain chain = mock(FilterChain.class);
+
+        when(jwtUtil.isTokenValid("invalid-token")).thenReturn(false);
+
+        filter.doFilter(request, response, chain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        verify(chain).doFilter(request, response);
+        verify(jwtUtil, never()).extractEmail(any());
     }
 }
