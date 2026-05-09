@@ -75,7 +75,7 @@ test.describe('Ürün yönetimi', () => {
     await expect(page.getByText("Fiyat 0'dan büyük olmalıdır")).toBeVisible()
   })
 
-  test.fixme('imageUrl ile ürün ekleme → görsel listede render edilir', async ({ page }) => {
+  test('imageUrl ile ürün ekleme → görsel listede render edilir', async ({ page }) => {
     // ProductModal'a imageUrl alanı eklendikten sonra bu testi aktifleştir.
     await page.goto('/dashboard/products')
 

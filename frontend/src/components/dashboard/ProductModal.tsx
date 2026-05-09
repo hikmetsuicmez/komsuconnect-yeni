@@ -1,4 +1,3 @@
-// src/components/dashboard/ProductModal.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -22,6 +21,11 @@ const productSchema = z.object({
       message: "Fiyat 0'dan büyük olmalıdır",
     }),
   available: z.boolean(),
+  imageUrl: z
+    .string()
+    .url('Geçerli bir URL giriniz')
+    .or(z.literal(''))
+    .optional(),
 })
 
 type ProductFormData = z.infer<typeof productSchema>
@@ -53,6 +57,7 @@ export default function ProductModal({
       description: product?.description ?? '',
       price: product?.price?.toString() ?? '',
       available: product?.available ?? true,
+      imageUrl: product?.imageUrl ?? '',
     },
   })
 
@@ -62,6 +67,7 @@ export default function ProductModal({
       description: product?.description ?? '',
       price: product?.price?.toString() ?? '',
       available: product?.available ?? true,
+      imageUrl: product?.imageUrl ?? '',
     })
   }, [product, reset])
 
@@ -80,6 +86,7 @@ export default function ProductModal({
       ...(data.description && { description: data.description }),
       price: parseFloat(data.price),
       available: data.available,
+      ...(data.imageUrl && { imageUrl: data.imageUrl }),
     }
     try {
       if (product) {
@@ -154,6 +161,19 @@ export default function ProductModal({
             />
             {errors.price && (
               <p className="text-xs text-accent">{errors.price.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="prod-image-url">Görsel URL&apos;si</Label>
+            <Input
+              id="prod-image-url"
+              type="url"
+              {...register('imageUrl')}
+              placeholder="https://example.com/gorsel.jpg"
+            />
+            {errors.imageUrl && (
+              <p className="text-xs text-accent">{errors.imageUrl.message}</p>
             )}
           </div>
 
