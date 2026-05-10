@@ -27,7 +27,6 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl text-foreground mb-8">Ürünlerim</h1>
       <ProductTable businessId={profile.id} />
     </div>
   )

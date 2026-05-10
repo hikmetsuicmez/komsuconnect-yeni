@@ -1,4 +1,15 @@
 // src/types/business.ts
+export type BusinessCategory =
+  | 'BAKERY'
+  | 'BUTCHER'
+  | 'GROCERY'
+  | 'MARKET'
+  | 'CAFE'
+  | 'FLORIST'
+  | 'HABERDASHER'
+  | 'REPAIR'
+  | 'OTHER'
+
 export interface BusinessProfile {
   id: string
   userId: string
@@ -7,6 +18,9 @@ export interface BusinessProfile {
   address: string | null
   city: string | null
   phone: string | null
+  category: BusinessCategory | null
+  neighborhood: string | null
+  workingHours: string | null
   createdAt: string
   updatedAt: string
 }
@@ -29,19 +43,12 @@ export interface CreateBusinessProfileRequest {
   address?: string
   city?: string
   phone?: string
+  category?: BusinessCategory
+  neighborhood?: string
+  workingHours?: string
 }
 
 export type UpdateBusinessProfileRequest = CreateBusinessProfileRequest
-
-export interface CreateProductRequest {
-  name: string
-  description?: string
-  price: number
-  imageUrl?: string
-  available: boolean
-}
-
-export type UpdateProductRequest = CreateProductRequest
 
 export interface BusinessPublicSummary {
   id: string
@@ -49,6 +56,8 @@ export interface BusinessPublicSummary {
   description: string | null
   city: string | null
   productCount: number
+  category: BusinessCategory | null
+  neighborhood: string | null
 }
 
 export interface ProductPublic {
@@ -69,4 +78,7 @@ export interface BusinessPublicDetail {
   phone: string | null
   productCount: number
   products: ProductPublic[]
+  category: BusinessCategory | null
+  neighborhood: string | null
+  workingHours: string | null
 }

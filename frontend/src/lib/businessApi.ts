@@ -2,17 +2,21 @@ import { notFound } from 'next/navigation'
 import type {
   BusinessPublicSummary,
   BusinessPublicDetail,
+  BusinessCategory,
 } from '@/types/business'
 
 const BASE = process.env.NEXT_PUBLIC_API_URL
 if (!BASE) throw new Error('NEXT_PUBLIC_API_URL is not set')
 
 export async function getBusinesses(
-  city?: string
+  city?: string,
+  category?: BusinessCategory
 ): Promise<BusinessPublicSummary[]> {
-  const url = city
-    ? `${BASE}/api/v1/businesses?city=${encodeURIComponent(city)}`
-    : `${BASE}/api/v1/businesses`
+  const params = new URLSearchParams()
+  if (city) params.set('city', city)
+  if (category) params.set('category', category)
+  const query = params.toString()
+  const url = `${BASE}/api/v1/businesses${query ? `?${query}` : ''}`
   try {
     const res = await fetch(url, { next: { revalidate: 60 } })
     if (!res.ok) return []
