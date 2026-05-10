@@ -1,24 +1,26 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import type { BusinessCategory } from '@/types/business'
 
 interface Props {
   cities: string[]
   selectedCity?: string
+  selectedCategory?: BusinessCategory
 }
 
-export default function CityFilter({ cities, selectedCity }: Props) {
+export default function CityFilter({ cities, selectedCity, selectedCategory }: Props) {
   const router = useRouter()
 
   if (cities.length === 0) return null
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value
-    if (value) {
-      router.push(`/?city=${encodeURIComponent(value)}`)
-    } else {
-      router.push('/')
-    }
+    const params = new URLSearchParams()
+    if (value) params.set('city', value)
+    if (selectedCategory) params.set('category', selectedCategory)
+    const query = params.toString()
+    router.push(query ? `/?${query}` : '/')
   }
 
   return (
