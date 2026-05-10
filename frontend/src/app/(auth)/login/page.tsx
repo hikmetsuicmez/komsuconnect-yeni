@@ -10,13 +10,12 @@ import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
 import api from '@/lib/api'
 import type { AuthResponse } from '@/types/auth'
 
 const loginSchema = z.object({
-  email: z.string().email({ message: 'Geçerli bir e-posta adresi girin' }),
+  email:    z.string().email({ message: 'Geçerli bir e-posta adresi girin' }),
   password: z.string().min(6, { message: 'Şifre en az 6 karakter olmalıdır' }),
 })
 
@@ -29,18 +28,14 @@ export default function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/')
-    }
+    if (isAuthenticated) router.replace('/')
   }, [isAuthenticated, router])
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  })
+  } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) })
 
   const onSubmit = async (data: LoginFormData) => {
     setServerError(null)
@@ -48,24 +43,19 @@ export default function LoginPage() {
       const response = await api.post<AuthResponse>('/api/v1/auth/login', data)
       const { token, role } = response.data
       login(token, { email: data.email, accountType: role })
-      if (role === 'BUSINESS') {
-        router.push('/dashboard')
-      } else {
-        router.push('/')
-      }
+      router.push(role === 'BUSINESS' ? '/dashboard' : '/')
     } catch (error: unknown) {
       if (
-        typeof error === 'object' &&
-        error !== null &&
+        typeof error === 'object' && error !== null &&
         'response' in error &&
         typeof (error as { response?: { status?: number } }).response?.status === 'number'
       ) {
         const status = (error as { response: { status: number } }).response.status
-        if (status === 401 || status === 400) {
-          setServerError('E-posta veya şifre hatalı.')
-        } else {
-          setServerError('Bir hata oluştu. Lütfen tekrar deneyin.')
-        }
+        setServerError(
+          status === 401 || status === 400
+            ? 'E-posta veya şifre hatalı.'
+            : 'Bir hata oluştu. Lütfen tekrar deneyin.'
+        )
       } else {
         setServerError('Sunucuya bağlanılamadı. Lütfen tekrar deneyin.')
       }
@@ -73,14 +63,28 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="space-y-1">
-          <CardTitle className="font-heading text-2xl">Tekrar hoş geldin</CardTitle>
-          <CardDescription>Hesabına giriş yap</CardDescription>
-        </CardHeader>
+    <div className="flex min-h-screen">
+      {/* Sol panel — md ve üzeri */}
+      <div className="hidden md:flex flex-col justify-center px-12 bg-primary w-1/2">
+        <div className="mb-6 flex items-baseline gap-0.5">
+          <span className="font-logo text-2xl text-surface">Komşu</span>
+          <span className="font-heading text-2xl text-accent">Connect</span>
+        </div>
+        <h2 className="font-heading text-4xl text-surface leading-tight mb-4">
+          HOŞ GELDİN.<br />MAHALLENE.
+        </h2>
+        <p className="text-surface/60 text-sm leading-relaxed max-w-xs">
+          Sokağındaki manav, fırın, kasap, çiçekçi — hepsi bir tıkla.
+          KomşuConnect, mahalle dokusunu dijitalde yaşatır.
+        </p>
+      </div>
 
-        <CardContent>
+      {/* Sağ panel */}
+      <div className="flex flex-col justify-center px-8 sm:px-12 w-full md:w-1/2 bg-[#F5EAD4]">
+        <div className="w-full max-w-sm mx-auto">
+          <h1 className="font-heading text-2xl text-foreground mb-1">Tekrar hoş geldin</h1>
+          <p className="text-foreground/60 text-sm mb-8">Hesabına giriş yap</p>
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">E-posta</Label>
@@ -94,9 +98,7 @@ export default function LoginPage() {
                   {...register('email')}
                 />
               </div>
-              {errors.email && (
-                <p className="text-xs text-accent">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-xs text-accent">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -114,33 +116,27 @@ export default function LoginPage() {
                   type="button"
                   aria-label={showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground transition-colors"
-                  onClick={() => setShowPassword((v) => !v)}
+                  onClick={() => setShowPassword(v => !v)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-xs text-accent">{errors.password.message}</p>
-              )}
+              {errors.password && <p className="text-xs text-accent">{errors.password.message}</p>}
             </div>
 
-            {serverError && (
-              <p className="text-sm text-accent text-center">{serverError}</p>
-            )}
+            {serverError && <p className="text-sm text-accent text-center">{serverError}</p>}
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? 'Giriş yapılıyor…' : 'Giriş Yap'}
             </Button>
           </form>
-        </CardContent>
 
-        <CardFooter className="flex justify-center text-sm text-foreground/60">
-          Hesabın yok mu?&nbsp;
-          <Link href="/register" className="text-accent hover:underline">
-            Kayıt ol
-          </Link>
-        </CardFooter>
-      </Card>
+          <p className="mt-6 text-center text-sm text-foreground/60">
+            Hesabın yok mu?{' '}
+            <Link href="/register" className="text-accent hover:underline">Kayıt ol</Link>
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
