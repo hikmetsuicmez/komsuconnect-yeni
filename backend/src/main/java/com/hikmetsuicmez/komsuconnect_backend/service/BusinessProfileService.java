@@ -5,6 +5,7 @@ import com.hikmetsuicmez.komsuconnect_backend.dto.request.UpdateBusinessProfileR
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileDetailResponse;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileResponse;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.ProductResponse;
+import com.hikmetsuicmez.komsuconnect_backend.entity.BusinessCategory;
 import com.hikmetsuicmez.komsuconnect_backend.entity.BusinessProfile;
 import com.hikmetsuicmez.komsuconnect_backend.entity.User;
 import com.hikmetsuicmez.komsuconnect_backend.exception.BusinessProfileAlreadyExistsException;
@@ -38,11 +39,8 @@ public class BusinessProfileService {
     private final ProductMapper productMapper;
 
     @Transactional(readOnly = true)
-    public List<BusinessProfileResponse> getAllBusinesses(String city) {
-        List<BusinessProfile> profiles = (city != null && !city.isBlank())
-                ? businessProfileRepository.findAllByCity(city)
-                : businessProfileRepository.findAllWithUser();
-
+    public List<BusinessProfileResponse> getAllBusinesses(String city, BusinessCategory category) {
+        List<BusinessProfile> profiles = businessProfileRepository.findAllFiltered(city, category);
         Map<UUID, Long> countMap = buildProductCountMap();
 
         return profiles.stream()
@@ -69,6 +67,9 @@ public class BusinessProfileService {
                 .address(profile.getAddress())
                 .city(profile.getCity())
                 .phone(profile.getPhone())
+                .category(profile.getCategory())
+                .neighborhood(profile.getNeighborhood())
+                .workingHours(profile.getWorkingHours())
                 .createdAt(profile.getCreatedAt())
                 .updatedAt(profile.getUpdatedAt())
                 .productCount(products.size())
@@ -96,6 +97,9 @@ public class BusinessProfileService {
                 .address(request.getAddress())
                 .city(request.getCity())
                 .phone(request.getPhone())
+                .category(request.getCategory() != null ? request.getCategory() : BusinessCategory.OTHER)
+                .neighborhood(request.getNeighborhood())
+                .workingHours(request.getWorkingHours())
                 .build();
 
         businessProfileRepository.save(profile);
@@ -113,6 +117,9 @@ public class BusinessProfileService {
         profile.setAddress(request.getAddress());
         profile.setCity(request.getCity());
         profile.setPhone(request.getPhone());
+        profile.setCategory(request.getCategory() != null ? request.getCategory() : profile.getCategory());
+        profile.setNeighborhood(request.getNeighborhood());
+        profile.setWorkingHours(request.getWorkingHours());
 
         return businessProfileMapper.toResponse(profile);
     }

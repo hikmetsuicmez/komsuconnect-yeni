@@ -1,5 +1,6 @@
 package com.hikmetsuicmez.komsuconnect_backend.dto.response;
 
+import com.hikmetsuicmez.komsuconnect_backend.entity.BusinessCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +22,9 @@ public class BusinessProfileDetailResponse {
     private String address;
     private String city;
     private String phone;
+    private BusinessCategory category;
+    private String neighborhood;
+    private String workingHours;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private long productCount;

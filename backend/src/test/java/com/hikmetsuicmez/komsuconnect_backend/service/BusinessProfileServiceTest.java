@@ -5,6 +5,7 @@ import com.hikmetsuicmez.komsuconnect_backend.dto.request.UpdateBusinessProfileR
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileDetailResponse;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileResponse;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.ProductResponse;
+import com.hikmetsuicmez.komsuconnect_backend.entity.BusinessCategory;
 import com.hikmetsuicmez.komsuconnect_backend.entity.BusinessProfile;
 import com.hikmetsuicmez.komsuconnect_backend.entity.Role;
 import com.hikmetsuicmez.komsuconnect_backend.entity.User;
@@ -30,6 +31,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -69,19 +71,17 @@ class BusinessProfileServiceTest {
         BusinessProfileResponse response = new BusinessProfileResponse();
         response.setId(profileId);
 
-        when(businessProfileRepository.findAllWithUser()).thenReturn(List.of(profile));
+        when(businessProfileRepository.findAllFiltered(null, null)).thenReturn(List.of(profile));
         when(businessProfileMapper.toResponse(profile)).thenReturn(response);
         List<Object[]> productCounts = new java.util.ArrayList<>();
         productCounts.add(new Object[]{profileId, 3L});
-        when(productRepository.findProductCountsByBusinessProfile())
-                .thenReturn(productCounts);
+        when(productRepository.findProductCountsByBusinessProfile()).thenReturn(productCounts);
 
-        List<BusinessProfileResponse> result = businessProfileService.getAllBusinesses(null);
+        List<BusinessProfileResponse> result = businessProfileService.getAllBusinesses(null, null);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getProductCount()).isEqualTo(3L);
-        verify(businessProfileRepository).findAllWithUser();
-        verify(businessProfileRepository, never()).findAllByCity(any());
+        verify(businessProfileRepository).findAllFiltered(null, null);
     }
 
     @Test
@@ -92,15 +92,50 @@ class BusinessProfileServiceTest {
         BusinessProfileResponse response = new BusinessProfileResponse();
         response.setId(profileId);
 
-        when(businessProfileRepository.findAllByCity("Istanbul")).thenReturn(List.of(profile));
+        when(businessProfileRepository.findAllFiltered("Istanbul", null)).thenReturn(List.of(profile));
         when(businessProfileMapper.toResponse(profile)).thenReturn(response);
         when(productRepository.findProductCountsByBusinessProfile()).thenReturn(List.of());
 
-        List<BusinessProfileResponse> result = businessProfileService.getAllBusinesses("Istanbul");
+        List<BusinessProfileResponse> result = businessProfileService.getAllBusinesses("Istanbul", null);
 
         assertThat(result).hasSize(1);
-        verify(businessProfileRepository).findAllByCity("Istanbul");
-        verify(businessProfileRepository, never()).findAllWithUser();
+        verify(businessProfileRepository).findAllFiltered("Istanbul", null);
+    }
+
+    @Test
+    void getAllBusinesses_withCategory_returnsFilteredByCategory() {
+        UUID profileId = UUID.randomUUID();
+        User user = buildUser("owner@example.com");
+        BusinessProfile profile = buildProfile(profileId, user);
+        BusinessProfileResponse response = new BusinessProfileResponse();
+        response.setId(profileId);
+
+        when(businessProfileRepository.findAllFiltered(null, BusinessCategory.BAKERY)).thenReturn(List.of(profile));
+        when(businessProfileMapper.toResponse(profile)).thenReturn(response);
+        when(productRepository.findProductCountsByBusinessProfile()).thenReturn(List.of());
+
+        List<BusinessProfileResponse> result = businessProfileService.getAllBusinesses(null, BusinessCategory.BAKERY);
+
+        assertThat(result).hasSize(1);
+        verify(businessProfileRepository).findAllFiltered(null, BusinessCategory.BAKERY);
+    }
+
+    @Test
+    void getAllBusinesses_withCityAndCategory_returnsFiltered() {
+        UUID profileId = UUID.randomUUID();
+        User user = buildUser("owner@example.com");
+        BusinessProfile profile = buildProfile(profileId, user);
+        BusinessProfileResponse response = new BusinessProfileResponse();
+        response.setId(profileId);
+
+        when(businessProfileRepository.findAllFiltered("Istanbul", BusinessCategory.CAFE)).thenReturn(List.of(profile));
+        when(businessProfileMapper.toResponse(profile)).thenReturn(response);
+        when(productRepository.findProductCountsByBusinessProfile()).thenReturn(List.of());
+
+        List<BusinessProfileResponse> result = businessProfileService.getAllBusinesses("Istanbul", BusinessCategory.CAFE);
+
+        assertThat(result).hasSize(1);
+        verify(businessProfileRepository).findAllFiltered("Istanbul", BusinessCategory.CAFE);
     }
 
     @Test
@@ -213,6 +248,28 @@ class BusinessProfileServiceTest {
     }
 
     @Test
+    void updateBusinessProfile_updatesAllNewFields() {
+        UUID profileId = UUID.randomUUID();
+        User owner = buildUser("owner@example.com");
+        BusinessProfile profile = buildProfile(profileId, owner);
+
+        UpdateBusinessProfileRequest request = new UpdateBusinessProfileRequest();
+        request.setBusinessName("Updated Shop");
+        request.setCategory(BusinessCategory.FLORIST);
+        request.setNeighborhood("Kadıköy");
+        request.setWorkingHours("09:00-20:00");
+
+        when(businessProfileRepository.findById(profileId)).thenReturn(Optional.of(profile));
+        when(businessProfileMapper.toResponse(profile)).thenReturn(new BusinessProfileResponse());
+
+        businessProfileService.updateBusinessProfile(profileId, request, "owner@example.com");
+
+        assertThat(profile.getCategory()).isEqualTo(BusinessCategory.FLORIST);
+        assertThat(profile.getNeighborhood()).isEqualTo("Kadıköy");
+        assertThat(profile.getWorkingHours()).isEqualTo("09:00-20:00");
+    }
+
+    @Test
     void getCities_returnsDistinctCities() {
         when(businessProfileRepository.findDistinctCities())
                 .thenReturn(List.of("Ankara", "Istanbul", "Izmir"));
@@ -220,5 +277,76 @@ class BusinessProfileServiceTest {
         List<String> cities = businessProfileService.getCities();
 
         assertThat(cities).containsExactly("Ankara", "Istanbul", "Izmir");
+    }
+
+    @Test
+    void createBusinessProfile_withNullCategory_defaultsToOther() {
+        String email = "owner@example.com";
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .email(email)
+                .password("encoded")
+                .fullName("Owner")
+                .role(Role.BUSINESS)
+                .build();
+
+        CreateBusinessProfileRequest request = new CreateBusinessProfileRequest();
+        request.setBusinessName("My Shop");
+        request.setPhone("0500000000");
+        // category intentionally left null
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(businessProfileRepository.existsByUserId(user.getId())).thenReturn(false);
+        when(businessProfileRepository.save(any(BusinessProfile.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(businessProfileMapper.toResponse(any(BusinessProfile.class))).thenReturn(new BusinessProfileResponse());
+
+        businessProfileService.createBusinessProfile(request, email);
+
+        verify(businessProfileRepository).save(argThat(p -> p.getCategory() == BusinessCategory.OTHER));
+    }
+
+    @Test
+    void createBusinessProfile_withExplicitCategory_setsCategory() {
+        String email = "owner@example.com";
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .email(email)
+                .password("encoded")
+                .fullName("Owner")
+                .role(Role.BUSINESS)
+                .build();
+
+        CreateBusinessProfileRequest request = new CreateBusinessProfileRequest();
+        request.setBusinessName("My Bakery");
+        request.setPhone("0500000000");
+        request.setCategory(BusinessCategory.BAKERY);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(businessProfileRepository.existsByUserId(user.getId())).thenReturn(false);
+        when(businessProfileRepository.save(any(BusinessProfile.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(businessProfileMapper.toResponse(any(BusinessProfile.class))).thenReturn(new BusinessProfileResponse());
+
+        businessProfileService.createBusinessProfile(request, email);
+
+        verify(businessProfileRepository).save(argThat(p -> p.getCategory() == BusinessCategory.BAKERY));
+    }
+
+    @Test
+    void updateBusinessProfile_withNullCategory_preservesExistingCategory() {
+        UUID profileId = UUID.randomUUID();
+        User owner = buildUser("owner@example.com");
+        BusinessProfile profile = buildProfile(profileId, owner);
+        profile.setCategory(BusinessCategory.CAFE);
+
+        UpdateBusinessProfileRequest request = new UpdateBusinessProfileRequest();
+        request.setBusinessName("Updated Shop");
+        // category intentionally left null
+
+        when(businessProfileRepository.findById(profileId)).thenReturn(Optional.of(profile));
+        when(businessProfileMapper.toResponse(profile)).thenReturn(new BusinessProfileResponse());
+
+        businessProfileService.updateBusinessProfile(profileId, request, "owner@example.com");
+
+        assertThat(profile.getCategory()).isEqualTo(BusinessCategory.CAFE);
     }
 }
