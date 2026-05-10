@@ -94,6 +94,9 @@ public class BusinessProfileService {
                 .address(request.getAddress())
                 .city(request.getCity())
                 .phone(request.getPhone())
+                .category(request.getCategory() != null ? request.getCategory() : BusinessCategory.OTHER)
+                .neighborhood(request.getNeighborhood())
+                .workingHours(request.getWorkingHours())
                 .build();
 
         businessProfileRepository.save(profile);

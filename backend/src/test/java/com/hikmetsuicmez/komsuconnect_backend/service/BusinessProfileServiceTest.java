@@ -31,6 +31,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -254,5 +255,57 @@ class BusinessProfileServiceTest {
         List<String> cities = businessProfileService.getCities();
 
         assertThat(cities).containsExactly("Ankara", "Istanbul", "Izmir");
+    }
+
+    @Test
+    void createBusinessProfile_withNullCategory_defaultsToOther() {
+        String email = "owner@example.com";
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .email(email)
+                .password("encoded")
+                .fullName("Owner")
+                .role(Role.BUSINESS)
+                .build();
+
+        CreateBusinessProfileRequest request = new CreateBusinessProfileRequest();
+        request.setBusinessName("My Shop");
+        request.setPhone("0500000000");
+        // category intentionally left null
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(businessProfileRepository.existsByUserId(user.getId())).thenReturn(false);
+        when(businessProfileRepository.save(any(BusinessProfile.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(businessProfileMapper.toResponse(any(BusinessProfile.class))).thenReturn(new BusinessProfileResponse());
+
+        businessProfileService.createBusinessProfile(request, email);
+
+        verify(businessProfileRepository).save(argThat(p -> p.getCategory() == BusinessCategory.OTHER));
+    }
+
+    @Test
+    void createBusinessProfile_withExplicitCategory_setsCategory() {
+        String email = "owner@example.com";
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .email(email)
+                .password("encoded")
+                .fullName("Owner")
+                .role(Role.BUSINESS)
+                .build();
+
+        CreateBusinessProfileRequest request = new CreateBusinessProfileRequest();
+        request.setBusinessName("My Bakery");
+        request.setPhone("0500000000");
+        request.setCategory(BusinessCategory.BAKERY);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(businessProfileRepository.existsByUserId(user.getId())).thenReturn(false);
+        when(businessProfileRepository.save(any(BusinessProfile.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(businessProfileMapper.toResponse(any(BusinessProfile.class))).thenReturn(new BusinessProfileResponse());
+
+        businessProfileService.createBusinessProfile(request, email);
+
+        verify(businessProfileRepository).save(argThat(p -> p.getCategory() == BusinessCategory.BAKERY));
     }
 }
