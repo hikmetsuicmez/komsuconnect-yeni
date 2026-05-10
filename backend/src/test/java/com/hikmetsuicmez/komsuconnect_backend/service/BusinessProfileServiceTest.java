@@ -330,4 +330,23 @@ class BusinessProfileServiceTest {
 
         verify(businessProfileRepository).save(argThat(p -> p.getCategory() == BusinessCategory.BAKERY));
     }
+
+    @Test
+    void updateBusinessProfile_withNullCategory_preservesExistingCategory() {
+        UUID profileId = UUID.randomUUID();
+        User owner = buildUser("owner@example.com");
+        BusinessProfile profile = buildProfile(profileId, owner);
+        profile.setCategory(BusinessCategory.CAFE);
+
+        UpdateBusinessProfileRequest request = new UpdateBusinessProfileRequest();
+        request.setBusinessName("Updated Shop");
+        // category intentionally left null
+
+        when(businessProfileRepository.findById(profileId)).thenReturn(Optional.of(profile));
+        when(businessProfileMapper.toResponse(profile)).thenReturn(new BusinessProfileResponse());
+
+        businessProfileService.updateBusinessProfile(profileId, request, "owner@example.com");
+
+        assertThat(profile.getCategory()).isEqualTo(BusinessCategory.CAFE);
+    }
 }

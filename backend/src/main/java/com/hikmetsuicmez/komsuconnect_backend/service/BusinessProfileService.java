@@ -117,7 +117,7 @@ public class BusinessProfileService {
         profile.setAddress(request.getAddress());
         profile.setCity(request.getCity());
         profile.setPhone(request.getPhone());
-        profile.setCategory(request.getCategory() != null ? request.getCategory() : BusinessCategory.OTHER);
+        profile.setCategory(request.getCategory() != null ? request.getCategory() : profile.getCategory());
         profile.setNeighborhood(request.getNeighborhood());
         profile.setWorkingHours(request.getWorkingHours());
 
