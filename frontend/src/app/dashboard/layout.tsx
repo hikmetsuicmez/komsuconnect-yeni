@@ -35,7 +35,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <BusinessProvider>
-      <div className="flex min-h-[calc(100vh-4rem)]">
+      <div className="flex min-h-[calc(100vh-4rem)] bg-[#F5EAD4]">
         <Sidebar />
         <main className="flex-1 p-8 min-w-0">{children}</main>
       </div>

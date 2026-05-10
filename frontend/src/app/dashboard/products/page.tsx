@@ -1,4 +1,3 @@
-// src/app/dashboard/products/page.tsx
 'use client'
 
 import { useEffect } from 'react'
@@ -26,5 +25,10 @@ export default function ProductsPage() {
 
   if (!profile) return null
 
-  return <ProductTable businessId={profile.id} />
+  return (
+    <div>
+      <h1 className="font-heading text-3xl text-foreground mb-8">Ürünlerim</h1>
+      <ProductTable businessId={profile.id} />
+    </div>
+  )
 }
