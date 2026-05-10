@@ -1,5 +1,6 @@
 package com.hikmetsuicmez.komsuconnect_backend.dto.request;
 
+import com.hikmetsuicmez.komsuconnect_backend.entity.BusinessCategory;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -20,4 +21,12 @@ public class CreateBusinessProfileRequest {
 
     @Size(min = 7, max = 20)
     private String phone;
+
+    private BusinessCategory category;
+
+    @Size(max = 100)
+    private String neighborhood;
+
+    @Size(max = 100)
+    private String workingHours;
 }
