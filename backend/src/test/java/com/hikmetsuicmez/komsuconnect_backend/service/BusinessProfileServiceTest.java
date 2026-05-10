@@ -5,6 +5,7 @@ import com.hikmetsuicmez.komsuconnect_backend.dto.request.UpdateBusinessProfileR
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileDetailResponse;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileResponse;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.ProductResponse;
+import com.hikmetsuicmez.komsuconnect_backend.entity.BusinessCategory;
 import com.hikmetsuicmez.komsuconnect_backend.entity.BusinessProfile;
 import com.hikmetsuicmez.komsuconnect_backend.entity.Role;
 import com.hikmetsuicmez.komsuconnect_backend.entity.User;
@@ -69,19 +70,17 @@ class BusinessProfileServiceTest {
         BusinessProfileResponse response = new BusinessProfileResponse();
         response.setId(profileId);
 
-        when(businessProfileRepository.findAllWithUser()).thenReturn(List.of(profile));
+        when(businessProfileRepository.findAllFiltered(null, null)).thenReturn(List.of(profile));
         when(businessProfileMapper.toResponse(profile)).thenReturn(response);
         List<Object[]> productCounts = new java.util.ArrayList<>();
         productCounts.add(new Object[]{profileId, 3L});
-        when(productRepository.findProductCountsByBusinessProfile())
-                .thenReturn(productCounts);
+        when(productRepository.findProductCountsByBusinessProfile()).thenReturn(productCounts);
 
-        List<BusinessProfileResponse> result = businessProfileService.getAllBusinesses(null);
+        List<BusinessProfileResponse> result = businessProfileService.getAllBusinesses(null, null);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getProductCount()).isEqualTo(3L);
-        verify(businessProfileRepository).findAllWithUser();
-        verify(businessProfileRepository, never()).findAllByCity(any());
+        verify(businessProfileRepository).findAllFiltered(null, null);
     }
 
     @Test
@@ -92,15 +91,50 @@ class BusinessProfileServiceTest {
         BusinessProfileResponse response = new BusinessProfileResponse();
         response.setId(profileId);
 
-        when(businessProfileRepository.findAllByCity("Istanbul")).thenReturn(List.of(profile));
+        when(businessProfileRepository.findAllFiltered("Istanbul", null)).thenReturn(List.of(profile));
         when(businessProfileMapper.toResponse(profile)).thenReturn(response);
         when(productRepository.findProductCountsByBusinessProfile()).thenReturn(List.of());
 
-        List<BusinessProfileResponse> result = businessProfileService.getAllBusinesses("Istanbul");
+        List<BusinessProfileResponse> result = businessProfileService.getAllBusinesses("Istanbul", null);
 
         assertThat(result).hasSize(1);
-        verify(businessProfileRepository).findAllByCity("Istanbul");
-        verify(businessProfileRepository, never()).findAllWithUser();
+        verify(businessProfileRepository).findAllFiltered("Istanbul", null);
+    }
+
+    @Test
+    void getAllBusinesses_withCategory_returnsFilteredByCategory() {
+        UUID profileId = UUID.randomUUID();
+        User user = buildUser("owner@example.com");
+        BusinessProfile profile = buildProfile(profileId, user);
+        BusinessProfileResponse response = new BusinessProfileResponse();
+        response.setId(profileId);
+
+        when(businessProfileRepository.findAllFiltered(null, BusinessCategory.BAKERY)).thenReturn(List.of(profile));
+        when(businessProfileMapper.toResponse(profile)).thenReturn(response);
+        when(productRepository.findProductCountsByBusinessProfile()).thenReturn(List.of());
+
+        List<BusinessProfileResponse> result = businessProfileService.getAllBusinesses(null, BusinessCategory.BAKERY);
+
+        assertThat(result).hasSize(1);
+        verify(businessProfileRepository).findAllFiltered(null, BusinessCategory.BAKERY);
+    }
+
+    @Test
+    void getAllBusinesses_withCityAndCategory_returnsFiltered() {
+        UUID profileId = UUID.randomUUID();
+        User user = buildUser("owner@example.com");
+        BusinessProfile profile = buildProfile(profileId, user);
+        BusinessProfileResponse response = new BusinessProfileResponse();
+        response.setId(profileId);
+
+        when(businessProfileRepository.findAllFiltered("Istanbul", BusinessCategory.CAFE)).thenReturn(List.of(profile));
+        when(businessProfileMapper.toResponse(profile)).thenReturn(response);
+        when(productRepository.findProductCountsByBusinessProfile()).thenReturn(List.of());
+
+        List<BusinessProfileResponse> result = businessProfileService.getAllBusinesses("Istanbul", BusinessCategory.CAFE);
+
+        assertThat(result).hasSize(1);
+        verify(businessProfileRepository).findAllFiltered("Istanbul", BusinessCategory.CAFE);
     }
 
     @Test

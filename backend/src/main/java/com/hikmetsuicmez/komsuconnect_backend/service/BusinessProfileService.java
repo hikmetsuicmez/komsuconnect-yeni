@@ -5,6 +5,7 @@ import com.hikmetsuicmez.komsuconnect_backend.dto.request.UpdateBusinessProfileR
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileDetailResponse;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileResponse;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.ProductResponse;
+import com.hikmetsuicmez.komsuconnect_backend.entity.BusinessCategory;
 import com.hikmetsuicmez.komsuconnect_backend.entity.BusinessProfile;
 import com.hikmetsuicmez.komsuconnect_backend.entity.User;
 import com.hikmetsuicmez.komsuconnect_backend.exception.BusinessProfileAlreadyExistsException;
@@ -38,11 +39,8 @@ public class BusinessProfileService {
     private final ProductMapper productMapper;
 
     @Transactional(readOnly = true)
-    public List<BusinessProfileResponse> getAllBusinesses(String city) {
-        List<BusinessProfile> profiles = (city != null && !city.isBlank())
-                ? businessProfileRepository.findAllByCity(city)
-                : businessProfileRepository.findAllWithUser();
-
+    public List<BusinessProfileResponse> getAllBusinesses(String city, BusinessCategory category) {
+        List<BusinessProfile> profiles = businessProfileRepository.findAllFiltered(city, category);
         Map<UUID, Long> countMap = buildProductCountMap();
 
         return profiles.stream()

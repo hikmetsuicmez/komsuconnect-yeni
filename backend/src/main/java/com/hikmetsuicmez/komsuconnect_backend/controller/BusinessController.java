@@ -4,6 +4,7 @@ import com.hikmetsuicmez.komsuconnect_backend.dto.request.CreateBusinessProfileR
 import com.hikmetsuicmez.komsuconnect_backend.dto.request.UpdateBusinessProfileRequest;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileDetailResponse;
 import com.hikmetsuicmez.komsuconnect_backend.dto.response.BusinessProfileResponse;
+import com.hikmetsuicmez.komsuconnect_backend.entity.BusinessCategory;
 import com.hikmetsuicmez.komsuconnect_backend.service.BusinessProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,9 @@ public class BusinessController {
 
     @GetMapping
     public ResponseEntity<List<BusinessProfileResponse>> getAllBusinesses(
-            @RequestParam(required = false) String city) {
-        return ResponseEntity.ok(businessProfileService.getAllBusinesses(city));
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) BusinessCategory category) {
+        return ResponseEntity.ok(businessProfileService.getAllBusinesses(city, category));
     }
 
     @GetMapping("/cities")
