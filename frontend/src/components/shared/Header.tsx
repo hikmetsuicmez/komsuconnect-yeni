@@ -13,22 +13,23 @@ export default function Header() {
   if (AUTH_ROUTES.includes(pathname)) return null
 
   return (
-    <header className="sticky top-0 z-50 bg-primary border-b border-muted">
+    <header className="sticky top-0 z-50 bg-primary border-b border-primary/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <Link href="/" className="font-heading text-xl font-bold text-accent">
-          KomsuConnect
+        <Link href="/" className="flex items-baseline gap-0.5">
+          <span className="font-logo text-xl text-surface">Komşu</span>
+          <span className="font-heading text-xl text-accent">Connect</span>
         </Link>
         <nav className="flex items-center gap-4">
           <Link
             href="/"
-            className="text-sm text-foreground/70 hover:text-foreground transition-colors"
+            className="text-sm text-surface/70 hover:text-surface transition-colors"
           >
             Esnafları Keşfet
           </Link>
           {isAuthenticated && user?.accountType === 'BUSINESS' && (
             <Link
               href="/dashboard"
-              className="text-sm text-foreground/70 hover:text-foreground transition-colors"
+              className="text-sm text-surface/70 hover:text-surface transition-colors"
             >
               Panel
             </Link>
@@ -36,7 +37,7 @@ export default function Header() {
           {isAuthenticated ? (
             <button
               onClick={logout}
-              className="text-sm text-foreground/70 hover:text-foreground transition-colors"
+              className="text-sm text-surface/70 hover:text-surface transition-colors"
             >
               Çıkış Yap
             </button>
@@ -44,7 +45,7 @@ export default function Header() {
             <>
               <Link
                 href="/login"
-                className="text-sm text-foreground/70 hover:text-foreground transition-colors"
+                className="text-sm text-surface/70 hover:text-surface transition-colors"
               >
                 Giriş Yap
               </Link>
