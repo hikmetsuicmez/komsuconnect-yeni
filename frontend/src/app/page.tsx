@@ -5,6 +5,7 @@ import CityFilter from '@/components/businesses/CityFilter'
 import CategoryFilter from '@/components/businesses/CategoryFilter'
 import type { Metadata } from 'next'
 import type { BusinessCategory } from '@/types/business'
+import { CATEGORY_LABELS } from '@/constants/categories'
 
 export const revalidate = 60
 
@@ -20,7 +21,11 @@ export default async function Home({
 }) {
   const params = await searchParams
   const city = params?.city
-  const category = params?.category as BusinessCategory | undefined
+  const rawCategory = params?.category
+  const category: BusinessCategory | undefined =
+    rawCategory && rawCategory in CATEGORY_LABELS
+      ? (rawCategory as BusinessCategory)
+      : undefined
 
   const [businesses, cities] = await Promise.all([
     getBusinesses(city, category),

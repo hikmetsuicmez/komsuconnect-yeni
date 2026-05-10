@@ -28,6 +28,7 @@ export default function CategoryFilter({ selectedCategory, selectedCity }: Props
           <button
             key={value}
             type="button"
+            aria-pressed={isActive}
             onClick={() => handleSelect(value)}
             className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg border text-xs font-medium transition-colors ${
               isActive

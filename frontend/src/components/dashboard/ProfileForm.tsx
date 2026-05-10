@@ -11,12 +11,9 @@ import { Label } from '@/components/ui/label'
 import api from '@/lib/api'
 import { useBusiness } from '@/hooks/useBusiness'
 import { CATEGORIES } from '@/constants/categories'
-import type { BusinessProfile } from '@/types/business'
+import type { BusinessCategory, BusinessProfile } from '@/types/business'
 
-const CATEGORY_VALUES = [
-  'BAKERY', 'BUTCHER', 'GROCERY', 'MARKET', 'CAFE',
-  'FLORIST', 'HABERDASHER', 'REPAIR', 'OTHER',
-] as const
+const CATEGORY_VALUES = CATEGORIES.map(c => c.value) as [BusinessCategory, ...BusinessCategory[]]
 
 const profileSchema = z.object({
   businessName: z.string().min(1, 'İşletme adı zorunludur'),
@@ -58,7 +55,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
       address: profile?.address ?? '',
       city: profile?.city ?? '',
       phone: profile?.phone ?? '',
-      category: profile?.category ?? undefined,
+      category: profile?.category ?? '',
       neighborhood: profile?.neighborhood ?? '',
       workingHours: profile?.workingHours ?? '',
     },
@@ -71,7 +68,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
       address: profile?.address ?? '',
       city: profile?.city ?? '',
       phone: profile?.phone ?? '',
-      category: profile?.category ?? undefined,
+      category: profile?.category ?? '',
       neighborhood: profile?.neighborhood ?? '',
       workingHours: profile?.workingHours ?? '',
     })
@@ -86,7 +83,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
       ...(data.address && { address: data.address }),
       ...(data.city && { city: data.city }),
       ...(data.phone && { phone: data.phone }),
-      ...((data.category as string | undefined) && (data.category as string) !== '' && { category: data.category as string }),
+      ...(data.category && { category: data.category }),
       ...(data.neighborhood && { neighborhood: data.neighborhood }),
       ...(data.workingHours && { workingHours: data.workingHours }),
     }
