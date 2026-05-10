@@ -248,6 +248,28 @@ class BusinessProfileServiceTest {
     }
 
     @Test
+    void updateBusinessProfile_updatesAllNewFields() {
+        UUID profileId = UUID.randomUUID();
+        User owner = buildUser("owner@example.com");
+        BusinessProfile profile = buildProfile(profileId, owner);
+
+        UpdateBusinessProfileRequest request = new UpdateBusinessProfileRequest();
+        request.setBusinessName("Updated Shop");
+        request.setCategory(BusinessCategory.FLORIST);
+        request.setNeighborhood("Kadıköy");
+        request.setWorkingHours("09:00-20:00");
+
+        when(businessProfileRepository.findById(profileId)).thenReturn(Optional.of(profile));
+        when(businessProfileMapper.toResponse(profile)).thenReturn(new BusinessProfileResponse());
+
+        businessProfileService.updateBusinessProfile(profileId, request, "owner@example.com");
+
+        assertThat(profile.getCategory()).isEqualTo(BusinessCategory.FLORIST);
+        assertThat(profile.getNeighborhood()).isEqualTo("Kadıköy");
+        assertThat(profile.getWorkingHours()).isEqualTo("09:00-20:00");
+    }
+
+    @Test
     void getCities_returnsDistinctCities() {
         when(businessProfileRepository.findDistinctCities())
                 .thenReturn(List.of("Ankara", "Istanbul", "Izmir"));

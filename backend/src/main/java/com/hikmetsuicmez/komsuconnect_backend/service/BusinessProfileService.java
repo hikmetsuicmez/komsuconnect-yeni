@@ -67,6 +67,9 @@ public class BusinessProfileService {
                 .address(profile.getAddress())
                 .city(profile.getCity())
                 .phone(profile.getPhone())
+                .category(profile.getCategory())
+                .neighborhood(profile.getNeighborhood())
+                .workingHours(profile.getWorkingHours())
                 .createdAt(profile.getCreatedAt())
                 .updatedAt(profile.getUpdatedAt())
                 .productCount(products.size())
@@ -114,6 +117,9 @@ public class BusinessProfileService {
         profile.setAddress(request.getAddress());
         profile.setCity(request.getCity());
         profile.setPhone(request.getPhone());
+        profile.setCategory(request.getCategory() != null ? request.getCategory() : BusinessCategory.OTHER);
+        profile.setNeighborhood(request.getNeighborhood());
+        profile.setWorkingHours(request.getWorkingHours());
 
         return businessProfileMapper.toResponse(profile);
     }
