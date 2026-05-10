@@ -42,6 +42,16 @@ public class BusinessProfile {
     @Column(length = 20)
     private String phone;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50)
+    private BusinessCategory category;
+
+    @Column(length = 100)
+    private String neighborhood;
+
+    @Column(length = 100)
+    private String workingHours;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
