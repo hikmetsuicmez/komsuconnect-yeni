@@ -122,11 +122,18 @@ public List<BusinessProfileResponse> getAllBusinesses(String city, BusinessCateg
 List<BusinessProfile> profiles = businessProfileRepository.findAllFiltered(city, category);
 ```
 
-`createBusinessProfile` içinde:
+`createBusinessProfile` içinde (builder'a eklenir):
 ```java
 .category(request.getCategory() != null ? request.getCategory() : BusinessCategory.OTHER)
 .neighborhood(request.getNeighborhood())
 .workingHours(request.getWorkingHours())
+```
+
+`updateBusinessProfile` içinde (mevcut set çağrılarının yanına eklenir):
+```java
+profile.setCategory(request.getCategory() != null ? request.getCategory() : BusinessCategory.OTHER);
+profile.setNeighborhood(request.getNeighborhood());
+profile.setWorkingHours(request.getWorkingHours());
 ```
 
 ---
