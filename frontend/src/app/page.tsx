@@ -25,19 +25,26 @@ export default async function Home({
   ])
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-10 text-center">
-        <h1 className="font-heading text-4xl font-bold text-foreground mb-3">
-          Mahallenin Esnafı Bir Tık Uzağında
-        </h1>
-        <p className="text-foreground/60 text-lg">
-          Yakın çevrendeki esnafları keşfet.
-        </p>
+    <div>
+      {/* Hero */}
+      <div className="border-b border-muted/30 py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="font-heading text-5xl sm:text-6xl text-foreground mb-4">
+            Mahallenin esnafı,<br />bir tıkla.
+          </h1>
+          <p className="text-foreground/60 text-lg">
+            Yakın çevrendeki esnafları keşfet.
+          </p>
+        </div>
       </div>
-      <Suspense>
-        <CityFilter cities={cities} selectedCity={city} />
-      </Suspense>
-      <BusinessGrid businesses={businesses} selectedCity={city} />
+
+      {/* İçerik */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <Suspense>
+          <CityFilter cities={cities} selectedCity={city} />
+        </Suspense>
+        <BusinessGrid businesses={businesses} selectedCity={city} />
+      </div>
     </div>
   )
 }
