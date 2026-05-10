@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getBusinessById } from '@/lib/businessApi'
 import ProductCard from '@/components/businesses/ProductCard'
+import { CATEGORY_LABELS } from '@/constants/categories'
 
 export const revalidate = 30
 
@@ -39,7 +40,7 @@ export default async function BusinessPage({
         </Link>
       </div>
 
-      {/* Hero banner — gradient placeholder, gerçek kapak görseli yok */}
+      {/* Hero banner */}
       <div className="relative w-full h-48 bg-gradient-to-br from-[#D4A340] via-[#C2492C]/80 to-[#26201A] flex items-end mt-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6 w-full">
           <h1 className="font-heading text-4xl text-white">
@@ -56,8 +57,13 @@ export default async function BusinessPage({
             <p className="text-foreground/70 mb-4">{business.description}</p>
           )}
           <div className="flex flex-wrap gap-4 text-sm text-foreground/60">
+            {business.category && (
+              <span>🏪 {CATEGORY_LABELS[business.category]}</span>
+            )}
             {business.city && <span>📍 {business.city}</span>}
+            {business.neighborhood && <span>{business.neighborhood}</span>}
             {business.address && <span>{business.address}</span>}
+            {business.workingHours && <span>🕐 {business.workingHours}</span>}
             {business.phone && (
               <a href={`tel:${business.phone}`} className="hover:text-accent transition-colors">
                 📞 {business.phone}
