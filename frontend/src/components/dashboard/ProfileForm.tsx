@@ -10,7 +10,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import api from '@/lib/api'
 import { useBusiness } from '@/hooks/useBusiness'
+import { CATEGORIES } from '@/constants/categories'
 import type { BusinessProfile } from '@/types/business'
+
+const CATEGORY_VALUES = [
+  'BAKERY', 'BUTCHER', 'GROCERY', 'MARKET', 'CAFE',
+  'FLORIST', 'HABERDASHER', 'REPAIR', 'OTHER',
+] as const
 
 const profileSchema = z.object({
   businessName: z.string().min(1, 'İşletme adı zorunludur'),
@@ -23,6 +29,9 @@ const profileSchema = z.object({
       message: 'Telefon 7-20 karakter arasında olmalıdır',
     })
     .optional(),
+  category: z.enum(CATEGORY_VALUES).optional(),
+  neighborhood: z.string().max(100, 'Mahalle en fazla 100 karakter olabilir').optional(),
+  workingHours: z.string().max(100, 'Çalışma saatleri en fazla 100 karakter olabilir').optional(),
 })
 
 type ProfileFormData = z.infer<typeof profileSchema>
@@ -49,6 +58,9 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
       address: profile?.address ?? '',
       city: profile?.city ?? '',
       phone: profile?.phone ?? '',
+      category: profile?.category ?? undefined,
+      neighborhood: profile?.neighborhood ?? '',
+      workingHours: profile?.workingHours ?? '',
     },
   })
 
@@ -59,6 +71,9 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
       address: profile?.address ?? '',
       city: profile?.city ?? '',
       phone: profile?.phone ?? '',
+      category: profile?.category ?? undefined,
+      neighborhood: profile?.neighborhood ?? '',
+      workingHours: profile?.workingHours ?? '',
     })
   }, [profile, reset])
 
@@ -71,6 +86,9 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
       ...(data.address && { address: data.address }),
       ...(data.city && { city: data.city }),
       ...(data.phone && { phone: data.phone }),
+      ...(data.category && { category: data.category }),
+      ...(data.neighborhood && { neighborhood: data.neighborhood }),
+      ...(data.workingHours && { workingHours: data.workingHours }),
     }
     try {
       if (profile) {
@@ -127,6 +145,49 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
         <Input id="city" {...register('city')} placeholder="İstanbul" />
         {errors.city && (
           <p className="text-xs text-accent">{errors.city.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="category">Kategori</Label>
+        <select
+          id="category"
+          {...register('category')}
+          className="w-full rounded-lg border border-muted bg-surface px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
+        >
+          <option value="">— Seçiniz —</option>
+          {CATEGORIES.map(({ value, label }) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+        {errors.category && (
+          <p className="text-xs text-accent">{errors.category.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="neighborhood">Mahalle</Label>
+        <Input
+          id="neighborhood"
+          {...register('neighborhood')}
+          placeholder="Kadıköy, Moda"
+        />
+        {errors.neighborhood && (
+          <p className="text-xs text-accent">{errors.neighborhood.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="workingHours">Çalışma Saatleri</Label>
+        <Input
+          id="workingHours"
+          {...register('workingHours')}
+          placeholder="09:00-18:00"
+        />
+        {errors.workingHours && (
+          <p className="text-xs text-accent">{errors.workingHours.message}</p>
         )}
       </div>
 
