@@ -61,7 +61,7 @@ export default async function BusinessPage({
               <span>🏪 {CATEGORY_LABELS[business.category]}</span>
             )}
             {business.city && <span>📍 {business.city}</span>}
-            {business.neighborhood && <span>{business.neighborhood}</span>}
+            {business.neighborhood && <span>🏘️ {business.neighborhood}</span>}
             {business.address && <span>{business.address}</span>}
             {business.workingHours && <span>🕐 {business.workingHours}</span>}
             {business.phone && (
