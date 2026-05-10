@@ -29,7 +29,7 @@ const profileSchema = z.object({
       message: 'Telefon 7-20 karakter arasında olmalıdır',
     })
     .optional(),
-  category: z.enum(CATEGORY_VALUES).optional(),
+  category: z.enum(CATEGORY_VALUES).optional().or(z.literal('')),
   neighborhood: z.string().max(100, 'Mahalle en fazla 100 karakter olabilir').optional(),
   workingHours: z.string().max(100, 'Çalışma saatleri en fazla 100 karakter olabilir').optional(),
 })
@@ -86,7 +86,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
       ...(data.address && { address: data.address }),
       ...(data.city && { city: data.city }),
       ...(data.phone && { phone: data.phone }),
-      ...(data.category && { category: data.category }),
+      ...((data.category as string | undefined) && (data.category as string) !== '' && { category: data.category as string }),
       ...(data.neighborhood && { neighborhood: data.neighborhood }),
       ...(data.workingHours && { workingHours: data.workingHours }),
     }
