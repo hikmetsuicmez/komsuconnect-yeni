@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Marka renkleri */
-  --color-primary:    #1a1a2e;
-  --color-accent:     #e94560;
-  --color-surface:    #16213e;
-  --color-muted:      #0f3460;
-  --color-foreground: #eaeaea;
+  /* Token remap: adlar korundu, değerler yeni palete çevrildi */
+  --color-primary:    #26201A;   /* header, sidebar, koyu zemin */
+  --color-accent:     #C2492C;   /* terracotta — CTA butonlar */
+  --color-surface:    #FFFBEF;   /* kart arka planları */
+  --color-muted:      #D4A340;   /* altın — border, ikincil vurgu */
+  --color-foreground: #26201A;   /* ana metin */
 
-  /* Fontlar — next/font HTML elementine CSS değişkeni olarak yazar */
-  --font-heading: var(--font-playfair);
+  --font-heading: var(--font-alfa-slab);
+  --font-logo:    var(--font-bagel);
   --font-body:    var(--font-inter);
 }
 
 body {
-  background-color: #1a1a2e;
-  color: #eaeaea;
+  background-color: #F5EAD4;  /* kraft bej sayfa arka planı */
+  color: #26201A;
 }
